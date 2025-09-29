@@ -48,6 +48,7 @@ export const CatCard: React.FC<CatCardProps> = ({
           height="300"
           image={cat.url}
           alt={breed?.name || 'Cat'}
+          loading="lazy"
           sx={sxStyles.catImage}
         />
         <IconButton

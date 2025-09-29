@@ -7,20 +7,29 @@ import {
   Button, 
   Box, 
   CircularProgress,
-  Alert
+  Alert,
+  Chip,
+  Collapse
 } from '@mui/material';
-import { Refresh } from '@mui/icons-material';
+import { Refresh, Speed, Info } from '@mui/icons-material';
 import { CatCard } from '../components/CatCard';
 import { CatDetailModal } from '../components/CatDetailModal';
 import { useRandomCats } from '../hooks/useCats';
+import { usePerformanceWarnings } from '../hooks/usePerformance';
 import { CatImage } from '../types';
 import { sxStyles } from '../components/StyledComponents';
 
 export const RandomCatsPage: React.FC = () => {
   const navigate = useNavigate();
   const location = useLocation();
-  const { cats, loading, error, loadMore } = useRandomCats();
+  const { cats, loading, error, loadMore, totalLoaded, hasReachedLimit, canLoadMore } = useRandomCats();
   const [selectedCat, setSelectedCat] = useState<CatImage | null>(null);
+  const { 
+    showMemoryWarning, 
+    showPerformanceInfo, 
+    hideMemoryWarning, 
+    hidePerformanceInfo 
+  } = usePerformanceWarnings(cats.length, totalLoaded);
 
   // Check if we have a cat ID in the URL - using imgId parameter as specified
   const urlParams = new URLSearchParams(location.search);
@@ -56,6 +65,32 @@ export const RandomCatsPage: React.FC = () => {
         🐱 Random Cats
       </Typography>
       
+      {/* Performance Warnings */}
+      <Collapse in={showMemoryWarning}>
+        <Alert 
+          severity="warning" 
+          onClose={hideMemoryWarning}
+          sx={{ mb: 2 }}
+          icon={<Speed />}
+        >
+          <Typography variant="subtitle2">Performance Notice</Typography>
+          Your browser is using a lot of memory. Consider refreshing the page for optimal performance.
+        </Alert>
+      </Collapse>
+      
+      <Collapse in={showPerformanceInfo}>
+        <Alert 
+          severity="info" 
+          onClose={hidePerformanceInfo}
+          sx={{ mb: 2 }}
+          icon={<Info />}
+        >
+          <Typography variant="subtitle2">💡 Performance Tip</Typography>
+          We automatically manage memory by keeping only recent cats visible. 
+          This keeps the page fast even after loading hundreds of cats!
+        </Alert>
+      </Collapse>
+      
       {cats.length === 0 && !loading ? (
         <Box sx={sxStyles.centerBox}>
           <Typography variant="h4" color="text.secondary" gutterBottom>
@@ -82,15 +117,45 @@ export const RandomCatsPage: React.FC = () => {
           </Grid>
 
           <Box sx={{ textAlign: 'center', mt: 5 }}>
-            <Button 
-              variant="contained"
-              size="large"
-              onClick={loadMore}
-              disabled={loading}
-              startIcon={loading ? <CircularProgress size={20} color="inherit" /> : undefined}
-            >
-              {loading ? 'Loading...' : 'Load More Cats'}
-            </Button>
+            {/* Performance Info */}
+            <Box sx={{ mb: 2 }}>
+              <Typography variant="body2" color="text.secondary">
+                Showing {cats.length} cats • Total loaded: {totalLoaded} cats
+              </Typography>
+              {cats.length !== totalLoaded && (
+                <Typography variant="caption" color="text.secondary">
+                  💡 Older cats are automatically removed to keep the page fast
+                </Typography>
+              )}
+            </Box>
+            
+            {hasReachedLimit ? (
+              <Box sx={{ textAlign: 'center' }}>
+                <Typography variant="h6" color="text.secondary" gutterBottom>
+                  🎉 You've seen a lot of cats today!
+                </Typography>
+                <Typography variant="body2" color="text.secondary" sx={{ mb: 2 }}>
+                  To keep the app fast, we've reached our loading limit.
+                </Typography>
+                <Button 
+                  variant="outlined"
+                  onClick={() => window.location.reload()}
+                  startIcon={<Refresh />}
+                >
+                  Start Fresh
+                </Button>
+              </Box>
+            ) : (
+              <Button 
+                variant="contained"
+                size="large"
+                onClick={loadMore}
+                disabled={!canLoadMore}
+                startIcon={loading ? <CircularProgress size={20} color="inherit" /> : undefined}
+              >
+                {loading ? 'Loading...' : 'Load More Cats'}
+              </Button>
+            )}
           </Box>
         </>
       )}

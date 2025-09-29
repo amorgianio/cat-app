@@ -1,20 +1,53 @@
 import { useState, useEffect } from 'react';
 import { CatImage, Breed, FavoriteCat } from '../types';
 import { catApi, favoritesStorage } from '../services/catApi';
+import { PERFORMANCE_CONFIG, PerformanceMonitor } from '../config/performance';
 
-// Hook for managing random cat images
+// Hook for managing random cat images with performance optimizations
 export const useRandomCats = () => {
   const [cats, setCats] = useState<CatImage[]>([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [totalLoaded, setTotalLoaded] = useState(0);
+  const [hasReachedLimit, setHasReachedLimit] = useState(false);
 
-  const loadCats = async (limit: number = 10, append: boolean = false) => {
+  const loadCats = async (limit: number = PERFORMANCE_CONFIG.LOAD_BATCH_SIZE, append: boolean = false) => {
     setLoading(true);
     setError(null);
     
     try {
       const newCats = await catApi.getRandomCats(limit);
-      setCats(prev => append ? [...prev, ...newCats] : newCats);
+      
+      setCats((prev: CatImage[]) => {
+        let updatedCats: CatImage[];
+        
+        if (append) {
+          updatedCats = [...prev, ...newCats];
+          
+          // Memory management: Keep only recent cats if we exceed threshold
+          if (updatedCats.length > PERFORMANCE_CONFIG.AUTO_CLEANUP_THRESHOLD) {
+            console.log(`🧹 Memory cleanup: Removing ${updatedCats.length - PERFORMANCE_CONFIG.MAX_CATS_IN_MEMORY} older cats`);
+            updatedCats = updatedCats.slice(-PERFORMANCE_CONFIG.MAX_CATS_IN_MEMORY);
+            
+            // Log performance metrics
+            if (PERFORMANCE_CONFIG.SHOW_PERFORMANCE_INFO) {
+              PerformanceMonitor.logPerformanceMetrics(updatedCats.length);
+            }
+          }
+        } else {
+          updatedCats = newCats;
+        }
+        
+        return updatedCats;
+      });
+      
+      setTotalLoaded((prev: number) => prev + newCats.length);
+      
+      // Check if we should limit loading
+      if (totalLoaded >= PERFORMANCE_CONFIG.SOFT_LIMIT_TOTAL) {
+        setHasReachedLimit(true);
+      }
+      
     } catch (err) {
       setError('Failed to load cats. Please try again.');
       console.error('Error loading cats:', err);
@@ -27,9 +60,29 @@ export const useRandomCats = () => {
     loadCats();
   }, []);
 
-  const loadMore = () => loadCats(10, true);
+  const loadMore = () => {
+    if (!hasReachedLimit) {
+      loadCats(PERFORMANCE_CONFIG.LOAD_BATCH_SIZE, true);
+    }
+  };
 
-  return { cats, loading, error, loadMore, reload: () => loadCats() };
+  const resetAndReload = () => {
+    setCats([]);
+    setTotalLoaded(0);
+    setHasReachedLimit(false);
+    loadCats();
+  };
+
+  return { 
+    cats, 
+    loading, 
+    error, 
+    loadMore, 
+    reload: resetAndReload,
+    totalLoaded,
+    hasReachedLimit,
+    canLoadMore: !hasReachedLimit && !loading
+  };
 };
 
 // Hook for managing cat breeds
