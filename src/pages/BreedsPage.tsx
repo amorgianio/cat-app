@@ -9,11 +9,15 @@ import {
   CardMedia,
   Box,
   CircularProgress,
-  Alert
+  Alert,
+  Skeleton
 } from '@mui/material';
 import { Modal } from '../components/Modal';
 import { CatCard } from '../components/CatCard';
 import { CatDetailModal } from '../components/CatDetailModal';
+import { CatCardSkeleton } from '../components/CatCardSkeleton';
+import { BreedGridSkeleton } from '../components/BreedCardSkeleton';
+import { DIMENSIONS } from '../components/StyledComponents';
 import { useBreeds, useBreedImages } from '../hooks/useCats';
 import { Breed, CatImage } from '../types';
 
@@ -90,12 +94,17 @@ export const BreedsPage: React.FC = () => {
   if (breedsLoading) {
     return (
       <Container maxWidth="xl" sx={{ py: 3 }}>
-        <Box sx={{ textAlign: 'center', py: 8 }}>
-          <CircularProgress size={60} />
-          <Typography variant="h6" sx={{ mt: 2 }}>
-            Loading cat breeds...
-          </Typography>
-        </Box>
+        <Typography variant="h2" component="h1" sx={{ textAlign: 'center', mb: 4, color: 'text.primary' }}>
+          🐾 Cat Breeds
+        </Typography>
+        
+        <Grid container spacing={3}>
+          {Array.from({ length: 12 }).map((_, index) => (
+            <Grid item xs={12} sm={6} md={4} key={`skeleton-${index}`}>
+              <BreedGridSkeleton count={1} />
+            </Grid>
+          ))}
+        </Grid>
       </Container>
     );
   }
@@ -172,12 +181,20 @@ export const BreedsPage: React.FC = () => {
             </Typography>
             
             {imagesLoading ? (
-              <Box sx={{ textAlign: 'center', py: 6 }}>
-                <CircularProgress size={60} />
-                <Typography variant="h6" sx={{ mt: 2 }}>
-                  Loading {selectedBreed.name} images...
-                </Typography>
-              </Box>
+              <Grid container spacing={2}>
+                {Array.from({ length: 8 }).map((_, index) => (
+                  <Grid item xs={12} sm={6} md={4} key={`skeleton-${index}`}>
+                    <Card sx={{ cursor: 'pointer' }}>
+                      <Skeleton
+                        variant="rectangular"
+                        width="100%"
+                        height={DIMENSIONS.BREED_MODAL_IMAGE_HEIGHT}
+                        animation="wave"
+                      />
+                    </Card>
+                  </Grid>
+                ))}
+              </Grid>
             ) : breedImages.length === 0 ? (
               <Box sx={{ textAlign: 'center', py: 6 }}>
                 <Typography variant="h6" color="text.secondary">
@@ -194,7 +211,7 @@ export const BreedsPage: React.FC = () => {
                     >
                       <CardMedia
                         component="img"
-                        height="250"
+                        height={DIMENSIONS.BREED_MODAL_IMAGE_HEIGHT}
                         image={cat.url}
                         alt={selectedBreed.name}
                         sx={{ objectFit: 'cover' }}

@@ -1,16 +1,17 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { 
   Card, 
   CardMedia, 
   CardContent, 
   Typography, 
   Box, 
-  IconButton 
+  IconButton,
+  Skeleton
 } from '@mui/material';
 import { Favorite, FavoriteBorder } from '@mui/icons-material';
 import { CatImage as CatImageType } from '../types';
 import { useFavorites } from '../hooks/useCats';
-import { sxStyles } from './StyledComponents';
+import { sxStyles, DIMENSIONS } from './StyledComponents';
 
 interface CatCardProps {
   cat: CatImageType;
@@ -24,6 +25,8 @@ export const CatCard: React.FC<CatCardProps> = ({
   showBreedInfo = true 
 }) => {
   const { addToFavorites, removeFromFavorites, isFavorite } = useFavorites();
+  const [imageLoaded, setImageLoaded] = useState(false);
+  const [imageError, setImageError] = useState(false);
 
   const handleFavoriteClick = (e: React.MouseEvent) => {
     e.stopPropagation();
@@ -35,6 +38,15 @@ export const CatCard: React.FC<CatCardProps> = ({
     }
   };
 
+  const handleImageLoad = () => {
+    setImageLoaded(true);
+  };
+
+  const handleImageError = () => {
+    setImageError(true);
+    setImageLoaded(true); // Stop showing skeleton even on error
+  };
+
   const breed = cat.breeds?.[0];
 
   return (
@@ -43,14 +55,59 @@ export const CatCard: React.FC<CatCardProps> = ({
       onClick={() => onClick(cat)}
     >
       <Box sx={{ position: 'relative' }}>
+        {/* Skeleton loader while image loads */}
+        {!imageLoaded && (
+          <Skeleton 
+            variant="rectangular" 
+            width="100%" 
+            height={DIMENSIONS.CAT_IMAGE_HEIGHT}
+            animation="wave"
+            sx={{ 
+              position: 'relative',
+              zIndex: 1,
+              bgcolor: 'grey.100'
+            }}
+          />
+        )}
+        
+        {/* Actual image */}
         <CardMedia
           component="img"
           height="300"
           image={cat.url}
           alt={breed?.name || 'Cat'}
           loading="lazy"
-          sx={sxStyles.catImage}
+          onLoad={handleImageLoad}
+          onError={handleImageError}
+          sx={{
+            ...sxStyles.catImage,
+            opacity: imageLoaded ? 1 : 0,
+            transition: 'opacity 0.2s ease-in-out',
+            display: imageError ? 'none' : 'block',
+            position: imageLoaded ? 'relative' : 'absolute',
+            top: imageLoaded ? 0 : '-300px'
+          }}
         />
+        
+        {/* Error fallback */}
+        {imageError && (
+          <Box 
+            sx={{ 
+              height: DIMENSIONS.CAT_IMAGE_HEIGHT, 
+              display: 'flex', 
+              alignItems: 'center', 
+              justifyContent: 'center',
+              bgcolor: 'grey.100',
+              color: 'text.secondary'
+            }}
+          >
+            <Typography variant="body2">
+              😿 Image not available
+            </Typography>
+          </Box>
+        )}
+        
+        {/* Favorite button */}
         <IconButton
           sx={sxStyles.favoriteButton}
           onClick={handleFavoriteClick}
@@ -61,14 +118,44 @@ export const CatCard: React.FC<CatCardProps> = ({
         </IconButton>
       </Box>
       
-      {showBreedInfo && breed && (
+      {showBreedInfo && (
         <CardContent>
-          <Typography variant="h6" component="h3" gutterBottom>
-            {breed.name}
-          </Typography>
-          <Typography variant="body2" color="text.secondary">
-            {breed.temperament?.split(',')[0]}
-          </Typography>
+          {!imageLoaded ? (
+            /* Always show text skeleton while image is loading */
+            <>
+              <Skeleton 
+                variant="text" 
+                width="60%" 
+                height={DIMENSIONS.BREED_NAME_HEIGHT}
+                sx={{ 
+                  transform: 'scale(1, 0.6)',
+                  transformOrigin: 'left center' 
+                }}
+              />
+              <Skeleton 
+                variant="text" 
+                width="40%" 
+                height={DIMENSIONS.BREED_INFO_HEIGHT}
+                sx={{ 
+                  transform: 'scale(1, 0.4)',
+                  transformOrigin: 'left center' 
+                }}
+              />
+            </>
+          ) : breed ? (
+            <>
+              <Typography variant="h6" component="h3" gutterBottom>
+                {breed.name}
+              </Typography>
+              <Typography variant="body2" color="text.secondary">
+                {breed.temperament?.split(',')[0]}
+              </Typography>
+            </>
+          ) : (
+            <Typography variant="body2" color="text.secondary">
+              Mixed breed
+            </Typography>
+          )}
         </CardContent>
       )}
     </Card>

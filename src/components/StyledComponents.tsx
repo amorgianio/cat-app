@@ -103,6 +103,42 @@ export const theme = createTheme({
   }
 });
 
+// Consistent dimensions for content and skeletons
+// Based on Material UI Typography default line heights and spacing
+export const DIMENSIONS = {
+  // Image dimensions (fixed heights)
+  CAT_IMAGE_HEIGHT: 300,
+  BREED_MODAL_IMAGE_HEIGHT: 250,
+  MODAL_IMAGE_MAX_HEIGHT: 500,
+  
+  // Typography dimensions (calculated from Material UI defaults + line-height)
+  // h4 (1.25rem * 1.235 line-height ≈ 24px) + margin
+  H4_HEIGHT: 40,
+  // h5 (1.5rem * 1.334 line-height ≈ 32px) but appears smaller in cards
+  H5_HEIGHT: 28,
+  // h6 (1.25rem * 1.6 line-height ≈ 32px) but tighter in cards  
+  H6_HEIGHT: 24,
+  // body1 (1rem * 1.5 line-height = 24px)
+  BODY1_HEIGHT: 24,
+  // body2 (0.875rem * 1.43 line-height ≈ 20px)
+  BODY2_HEIGHT: 20,
+  // caption (0.75rem * 1.66 line-height ≈ 20px)
+  CAPTION_HEIGHT: 20,
+  
+  // Legacy component heights (for backward compatibility)
+  BREED_NAME_HEIGHT: 28,      // Same as H5_HEIGHT
+  BREED_INFO_HEIGHT: 20,      // Same as BODY2_HEIGHT
+  
+  // Component dimensions
+  BUTTON_HEIGHT: 36,           // Material UI Button default
+  CHIP_HEIGHT: 32,            // Material UI Chip default
+  FAVORITE_BUTTON_SIZE: 40,   // IconButton with small size
+  
+  // Spacing dimensions
+  TEXT_MARGIN_BOTTOM: 8,      // Standard gutterBottom spacing
+  PARAGRAPH_SPACING: 16,      // Paragraph spacing
+} as const;
+
 // Common sx prop objects for reusability - Modern Material UI v6 approach
 export const sxStyles = {
   // Container styles
@@ -136,7 +172,7 @@ export const sxStyles = {
   
   catImage: {
     width: '100%',
-    height: 300,
+    height: DIMENSIONS.CAT_IMAGE_HEIGHT,
     objectFit: 'cover'
   },
   
@@ -145,6 +181,8 @@ export const sxStyles = {
     position: 'absolute',
     top: 8,
     right: 8,
+    width: DIMENSIONS.FAVORITE_BUTTON_SIZE,
+    height: DIMENSIONS.FAVORITE_BUTTON_SIZE,
     backgroundColor: 'rgba(255, 255, 255, 0.9)',
     '&:hover': {
       backgroundColor: 'rgba(255, 255, 255, 1)',

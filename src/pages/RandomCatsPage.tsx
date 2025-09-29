@@ -14,6 +14,7 @@ import {
 import { Refresh, Speed, Info } from '@mui/icons-material';
 import { CatCard } from '../components/CatCard';
 import { CatDetailModal } from '../components/CatDetailModal';
+import { CatGridSkeleton } from '../components/CatCardSkeleton';
 import { useRandomCats } from '../hooks/useCats';
 import { usePerformanceWarnings } from '../hooks/usePerformance';
 import { CatImage } from '../types';
@@ -106,6 +107,7 @@ export const RandomCatsPage: React.FC = () => {
       ) : (
         <>
           <Grid container spacing={3}>
+            {/* Actual cat cards */}
             {cats.map((cat: CatImage) => (
               <Grid item xs={12} sm={6} md={4} lg={3} key={cat.id}>
                 <CatCard 
@@ -114,6 +116,17 @@ export const RandomCatsPage: React.FC = () => {
                 />
               </Grid>
             ))}
+            
+            {/* Loading skeletons for initial load or "Load More" */}
+            {loading && (
+              <>
+                {Array.from({ length: cats.length === 0 ? 10 : 10 }).map((_, index) => (
+                  <Grid item xs={12} sm={6} md={4} lg={3} key={`skeleton-${index}`}>
+                    <CatGridSkeleton count={1} />
+                  </Grid>
+                ))}
+              </>
+            )}
           </Grid>
 
           <Box sx={{ textAlign: 'center', mt: 5 }}>

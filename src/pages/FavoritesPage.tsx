@@ -6,14 +6,13 @@ import {
   Grid, 
   Button, 
   Box, 
-  Alert,
   Chip
 } from '@mui/material';
-import { Delete, Clear } from '@mui/icons-material';
+import { Clear } from '@mui/icons-material';
 import { CatCard } from '../components/CatCard';
 import { CatDetailModal } from '../components/CatDetailModal';
 import { useFavorites } from '../hooks/useCats';
-import { FavoriteCat } from '../types';
+import { FavoriteCat, CatImage } from '../types';
 
 export const FavoritesPage: React.FC = () => {
   const navigate = useNavigate();
@@ -25,8 +24,10 @@ export const FavoritesPage: React.FC = () => {
   const urlParams = new URLSearchParams(location.search);
   const catIdFromUrl = urlParams.get('imgId');
 
-  const handleCatClick = (cat: FavoriteCat) => {
-    setSelectedCat(cat);
+  const handleCatClick = (cat: CatImage) => {
+    // Cast to FavoriteCat since we know it comes from favorites
+    const favoriteCat = cat as FavoriteCat;
+    setSelectedCat(favoriteCat);
     navigate(`/favorites?imgId=${cat.id}`, { replace: true });
   };
 

@@ -8,8 +8,10 @@ import {
   CircularProgress,
   Alert,
   CardMedia,
-  Divider
+  Divider,
+  Skeleton
 } from '@mui/material';
+import { DIMENSIONS } from './StyledComponents';
 import { Favorite, FavoriteBorder, Launch, Category, Share } from '@mui/icons-material';
 import { Modal } from './Modal';
 import { useCatById, useFavorites } from '../hooks/useCats';
@@ -103,12 +105,162 @@ export const CatDetailModal: React.FC<CatDetailModalProps> = ({
 
   if (loading) {
     return (
-      <Modal isOpen={isOpen} onClose={handleClose}>
-        <Box sx={{ ...sxStyles.centerBox, p: 5 }}>
-          <CircularProgress size={60} />
-          <Typography variant="h6" sx={{ mt: 2 }}>
-            Loading cat details...
-          </Typography>
+      <Modal isOpen={isOpen} onClose={handleClose} maxWidth="md">
+        <Box>
+          {/* Image Skeleton - Exact same max height as actual modal image */}
+          <Skeleton 
+            variant="rectangular" 
+            width="100%" 
+            height={DIMENSIONS.MODAL_IMAGE_MAX_HEIGHT}
+            animation="wave"
+          />
+          
+          <Box sx={sxStyles.modalBox}>
+            {/* Title Skeleton - Same height as h4 Typography */}
+            <Skeleton 
+              variant="text" 
+              width="40%" 
+              height={DIMENSIONS.H4_HEIGHT} 
+              sx={{ 
+                mb: 2,
+                transform: 'scale(1, 0.6)'
+              }} 
+            />
+            
+            {/* Caption Skeleton - Same height as caption Typography */}
+            <Skeleton 
+              variant="text" 
+              width="70%" 
+              height={DIMENSIONS.CAPTION_HEIGHT} 
+              sx={{ 
+                mb: 2,
+                transform: 'scale(1, 0.4)'
+              }} 
+            />
+            
+            {/* Info Skeletons - Same height as body1 Typography */}
+            <Box sx={{ mb: 2 }}>
+              <Skeleton 
+                variant="text" 
+                width="30%" 
+                height={DIMENSIONS.BODY1_HEIGHT} 
+                sx={{ 
+                  mb: 1,
+                  transform: 'scale(1, 0.5)'
+                }} 
+              />
+              <Skeleton 
+                variant="text" 
+                width="25%" 
+                height={DIMENSIONS.BODY1_HEIGHT} 
+                sx={{ 
+                  mb: 1,
+                  transform: 'scale(1, 0.5)'
+                }} 
+              />
+              <Skeleton 
+                variant="text" 
+                width="20%" 
+                height={DIMENSIONS.BODY1_HEIGHT} 
+                sx={{ 
+                  mb: 2,
+                  transform: 'scale(1, 0.5)'
+                }} 
+              />
+            </Box>
+            
+            {/* Description Skeleton - Same height as body1 Typography */}
+            <Skeleton 
+              variant="text" 
+              width="100%" 
+              height={DIMENSIONS.BODY1_HEIGHT} 
+              sx={{ 
+                mb: 1,
+                transform: 'scale(1, 0.5)'
+              }} 
+            />
+            <Skeleton 
+              variant="text" 
+              width="90%" 
+              height={DIMENSIONS.BODY1_HEIGHT} 
+              sx={{ 
+                mb: 1,
+                transform: 'scale(1, 0.5)'
+              }} 
+            />
+            <Skeleton 
+              variant="text" 
+              width="80%" 
+              height={DIMENSIONS.BODY1_HEIGHT} 
+              sx={{ 
+                mb: 3,
+                transform: 'scale(1, 0.5)'
+              }} 
+            />
+            
+            {/* Temperament Chips Skeleton - Exact same height as Chip components */}
+            <Skeleton 
+              variant="text" 
+              width="30%" 
+              height={DIMENSIONS.H6_HEIGHT}
+              sx={{ 
+                mb: 2,
+                transform: 'scale(1, 0.6)'
+              }}
+            />
+            <Box sx={{ display: 'flex', gap: 1, mb: 3, flexWrap: 'wrap' }}>
+              <Skeleton 
+                variant="rounded" 
+                width={80} 
+                height={DIMENSIONS.CHIP_HEIGHT} 
+              />
+              <Skeleton 
+                variant="rounded" 
+                width={100} 
+                height={DIMENSIONS.CHIP_HEIGHT} 
+              />
+              <Skeleton 
+                variant="rounded" 
+                width={70} 
+                height={DIMENSIONS.CHIP_HEIGHT} 
+              />
+              <Skeleton 
+                variant="rounded" 
+                width={90} 
+                height={DIMENSIONS.CHIP_HEIGHT} 
+              />
+            </Box>
+            
+            <Divider sx={{ my: 2 }} />
+            
+            {/* Buttons Skeleton - Exact same height as Button components */}
+            <Skeleton 
+              variant="text" 
+              width="40%" 
+              height={DIMENSIONS.H6_HEIGHT} 
+              sx={{ 
+                mb: 2,
+                transform: 'scale(1, 0.6)'
+              }} 
+            />
+            <Box sx={{ display: 'flex', gap: 2, flexWrap: 'wrap' }}>
+              <Skeleton 
+                variant="rounded" 
+                width={180} 
+                height={DIMENSIONS.BUTTON_HEIGHT} 
+              />
+              <Skeleton 
+                variant="rounded" 
+                width={160} 
+                height={DIMENSIONS.BUTTON_HEIGHT} 
+              />
+              <Skeleton 
+                variant="rounded" 
+                width={120} 
+                height={DIMENSIONS.BUTTON_HEIGHT} 
+              />
+            </Box>
+          </Box>
         </Box>
       </Modal>
     );
