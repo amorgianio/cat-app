@@ -1,26 +1,102 @@
-import axios from 'axios';
+import axios, { InternalAxiosRequestConfig, AxiosResponse, AxiosError } from 'axios';
 import { CatImage, Breed, FavoriteCat } from '../types';
 
-const API_KEY = 'live_YOUR_API_KEY_HERE'; // TODO: Add your API key from thecatapi.com
-const BASE_URL = 'https://api.thecatapi.com/v1';
+// Security: Use environment variables for sensitive data
+const API_KEY = process.env.REACT_APP_CAT_API_KEY;
+const BASE_URL = process.env.REACT_APP_CAT_API_BASE_URL || 'https://api.thecatapi.com/v1';
+
+// Validate required environment variables
+if (!API_KEY) {
+  console.error('Missing REACT_APP_CAT_API_KEY environment variable');
+}
 
 const api = axios.create({
   baseURL: BASE_URL,
   headers: {
     'x-api-key': API_KEY,
+    'Content-Type': 'application/json',
   },
+  timeout: 10000, // 10 second timeout
+  maxRedirects: 3, // Limit redirects for security
 });
 
+// Security: Add request/response interceptors
+api.interceptors.request.use(
+  (config: InternalAxiosRequestConfig) => {
+    // Log requests in development (remove in production)
+    if (process.env.NODE_ENV === 'development') {
+      console.log(`API Request: ${config.method?.toUpperCase()} ${config.url}`);
+    }
+    return config;
+  },
+  (error: AxiosError) => Promise.reject(error)
+);
+
+api.interceptors.response.use(
+  (response: AxiosResponse) => response,
+  (error: AxiosError) => {
+    // Enhanced error handling
+    if (error.response) {
+      // Server responded with error status
+      console.error('API Error:', error.response.status, error.response.data);
+    } else if (error.request) {
+      // Request made but no response
+      console.error('Network Error: No response received');
+    } else {
+      // Something else happened
+      console.error('Request Error:', error.message);
+    }
+    return Promise.reject(error);
+  }
+);
+
+// Input validation utilities
+const validateInput = {
+  limit: (limit: number): number => {
+    const sanitized = Math.max(1, Math.min(50, Math.floor(limit))); // Clamp between 1-50
+    if (sanitized !== limit) {
+      console.warn(`Limit ${limit} sanitized to ${sanitized}`);
+    }
+    return sanitized;
+  },
+  
+  imageId: (imageId: string): string => {
+    // Validate imageId format (alphanumeric + some special chars)
+    const sanitized = imageId.replace(/[^a-zA-Z0-9_-]/g, '');
+    if (sanitized !== imageId) {
+      console.warn('ImageId sanitized, invalid characters removed');
+    }
+    if (sanitized.length === 0) {
+      throw new Error('Invalid image ID');
+    }
+    return sanitized;
+  },
+  
+  breedId: (breedId: string): string => {
+    // Validate breedId format
+    const sanitized = breedId.replace(/[^a-zA-Z0-9_-]/g, '');
+    if (sanitized !== breedId) {
+      console.warn('BreedId sanitized, invalid characters removed');
+    }
+    if (sanitized.length === 0) {
+      throw new Error('Invalid breed ID');
+    }
+    return sanitized;
+  }
+};
+
 export const catApi = {
-  // Get random cat images
+  // Get random cat images with input validation
   getRandomCats: async (limit: number = 10): Promise<CatImage[]> => {
-    const response = await api.get(`/images/search?limit=${limit}&has_breeds=1`);
+    const safeLimit = validateInput.limit(limit);
+    const response = await api.get(`/images/search?limit=${safeLimit}&has_breeds=1`);
     return response.data;
   },
 
-  // Get specific cat image by ID
+  // Get specific cat image by ID with input validation
   getCatById: async (imageId: string): Promise<CatImage> => {
-    const response = await api.get(`/images/${imageId}`);
+    const safeImageId = validateInput.imageId(imageId);
+    const response = await api.get(`/images/${safeImageId}`);
     return response.data;
   },
 
@@ -30,9 +106,11 @@ export const catApi = {
     return response.data;
   },
 
-  // Get images for a specific breed
+  // Get images for a specific breed with input validation
   getImagesByBreed: async (breedId: string, limit: number = 8): Promise<CatImage[]> => {
-    const response = await api.get(`/images/search?breed_ids=${breedId}&limit=${limit}`);
+    const safeBreedId = validateInput.breedId(breedId);
+    const safeLimit = validateInput.limit(limit);
+    const response = await api.get(`/images/search?breed_ids=${safeBreedId}&limit=${safeLimit}`);
     return response.data;
   },
 };
