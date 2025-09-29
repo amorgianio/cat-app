@@ -8,8 +8,8 @@ import {
   Box, 
   CircularProgress,
   Alert,
-  Chip,
-  Collapse
+  Collapse,
+  LinearProgress
 } from '@mui/material';
 import { Refresh, Speed, Info } from '@mui/icons-material';
 import { CatCard } from '../components/CatCard';
@@ -17,6 +17,7 @@ import { CatDetailModal } from '../components/CatDetailModal';
 import { CatGridSkeleton } from '../components/CatCardSkeleton';
 import { useRandomCats } from '../hooks/useCats';
 import { usePerformanceWarnings } from '../hooks/usePerformance';
+import { PERFORMANCE_CONFIG } from '../config/performance';
 import { CatImage } from '../types';
 import { sxStyles } from '../components/StyledComponents';
 
@@ -130,30 +131,145 @@ export const RandomCatsPage: React.FC = () => {
           </Grid>
 
           <Box sx={{ textAlign: 'center', mt: 5 }}>
-            {/* Performance Info */}
-            <Box sx={{ mb: 2 }}>
-              <Typography variant="body2" color="text.secondary">
-                Showing {cats.length} cats • Total loaded: {totalLoaded} cats
-              </Typography>
+            {/* Enhanced Performance Info Card */}
+            <Box sx={{ 
+              mb: 3,
+              p: 3,
+              backgroundColor: 'background.paper',
+              borderRadius: 2,
+              border: 1,
+              borderColor: 'divider',
+              maxWidth: 500,
+              mx: 'auto',
+              boxShadow: 1
+            }}>
+              {/* Main Stats */}
+              <Box sx={{ 
+                display: 'flex', 
+                justifyContent: 'center', 
+                alignItems: 'center', 
+                gap: 3,
+                mb: 2,
+                flexWrap: 'wrap'
+              }}>
+                <Box sx={{ textAlign: 'center' }}>
+                  <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 0.5, mb: 0.5 }}>
+                    <Typography variant="h4" color="primary.main" fontWeight={700}>
+                      {cats.length}
+                    </Typography>
+                    <Typography variant="h6" color="primary.main">🐱</Typography>
+                  </Box>
+                  <Typography variant="body2" color="text.secondary" fontWeight={500}>
+                    Currently Visible
+                  </Typography>
+                </Box>
+                
+                <Box sx={{ 
+                  width: 2, 
+                  height: 50, 
+                  backgroundColor: 'divider',
+                  display: { xs: 'none', sm: 'block' }
+                }} />
+                
+                <Box sx={{ textAlign: 'center' }}>
+                  <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 0.5, mb: 0.5 }}>
+                    <Typography variant="h4" color="secondary.main" fontWeight={700}>
+                      {totalLoaded}
+                    </Typography>
+                    <Typography variant="h6" color="secondary.main">📈</Typography>
+                  </Box>
+                  <Typography variant="body2" color="text.secondary" fontWeight={500}>
+                    Total Loaded
+                  </Typography>
+                </Box>
+              </Box>
+
+              {/* Memory Management Info */}
               {cats.length !== totalLoaded && (
-                <Typography variant="caption" color="text.secondary">
-                  💡 Older cats are automatically removed to keep the page fast
-                </Typography>
+                <Box sx={{
+                  p: 2,
+                  backgroundColor: 'warning.light',
+                  borderRadius: 1,
+                  border: 1,
+                  borderColor: 'warning.main',
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  gap: 1,
+                  mb: 1
+                }}>
+                  <Speed sx={{ color: 'warning.dark', fontSize: 20 }} />
+                  <Typography variant="body2" color="warning.dark" fontWeight={600}>
+                    Smart Memory Management Active
+                  </Typography>
+                </Box>
               )}
+
+              {/* Progress to Limit */}
+              {!hasReachedLimit && (
+                <Box sx={{ mt: 2 }}>
+                  <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 1 }}>
+                    <Typography variant="caption" color="text.secondary">
+                      Progress to Performance Limit
+                    </Typography>
+                    <Typography variant="caption" color="text.secondary" fontWeight={600}>
+                      {Math.round((totalLoaded / PERFORMANCE_CONFIG.SOFT_LIMIT_TOTAL) * 100)}%
+                    </Typography>
+                  </Box>
+                  <LinearProgress 
+                    variant="determinate" 
+                    value={(totalLoaded / PERFORMANCE_CONFIG.SOFT_LIMIT_TOTAL) * 100}
+                    sx={{ 
+                      height: 6, 
+                      borderRadius: 3,
+                      backgroundColor: 'action.hover',
+                      '& .MuiLinearProgress-bar': {
+                        backgroundColor: totalLoaded > (PERFORMANCE_CONFIG.SOFT_LIMIT_TOTAL * 0.8) ? 'warning.main' : 'primary.main'
+                      }
+                    }}
+                  />
+                  <Typography variant="caption" color="text.secondary" sx={{ mt: 1, display: 'block' }}>
+                    {PERFORMANCE_CONFIG.SOFT_LIMIT_TOTAL - totalLoaded} more cats until limit reached
+                  </Typography>
+                </Box>
+              )}
+
+              {/* Explanation */}
+              <Typography variant="caption" color="text.secondary" sx={{ mt: 2, display: 'block' }}>
+                {cats.length !== totalLoaded 
+                  ? `${totalLoaded - cats.length} older cats removed to optimize performance`
+                  : 'All loaded cats are currently visible'
+                }
+              </Typography>
             </Box>
             
             {hasReachedLimit ? (
-              <Box sx={{ textAlign: 'center' }}>
-                <Typography variant="h6" color="text.secondary" gutterBottom>
-                  🎉 You've seen a lot of cats today!
+              <Box sx={{ 
+                p: 3,
+                backgroundColor: 'background.paper',
+                borderRadius: 2,
+                border: 1,
+                borderColor: 'success.light',
+                maxWidth: 400,
+                mx: 'auto',
+                textAlign: 'center',
+                boxShadow: 1
+              }}>
+                <Typography variant="h5" sx={{ mb: 2 }}>
+                  🎉 Wow, that's a lot of cats!
                 </Typography>
-                <Typography variant="body2" color="text.secondary" sx={{ mb: 2 }}>
-                  To keep the app fast, we've reached our loading limit.
+                <Typography variant="body1" color="text.secondary" sx={{ mb: 2 }}>
+                  You've reached our performance limit of <strong>{totalLoaded} cats</strong>
+                </Typography>
+                <Typography variant="body2" color="text.secondary" sx={{ mb: 3 }}>
+                  Ready to start fresh with a new batch of adorable cats?
                 </Typography>
                 <Button 
-                  variant="outlined"
+                  variant="contained"
+                  size="large"
                   onClick={() => window.location.reload()}
                   startIcon={<Refresh />}
+                  sx={{ minWidth: 160 }}
                 >
                   Start Fresh
                 </Button>

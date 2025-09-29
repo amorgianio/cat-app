@@ -7,6 +7,7 @@ import '@fontsource/roboto/400.css';
 import '@fontsource/roboto/500.css';
 import '@fontsource/roboto/700.css';
 import { Navigation } from './components/Navigation';
+import { Footer } from './components/Footer';
 import { RandomCatsPage } from './pages/RandomCatsPage';
 import { BreedsPage } from './pages/BreedsPage';
 import { FavoritesPage } from './pages/FavoritesPage';
@@ -17,15 +18,23 @@ const App: React.FC = () => {
     <ThemeProvider theme={theme}>
       <CssBaseline />
       <Router>
-        <Box sx={{ minHeight: '100vh', backgroundColor: 'background.default' }}>
+        <Box sx={{ 
+          minHeight: '100vh', 
+          backgroundColor: 'background.default',
+          display: 'flex',
+          flexDirection: 'column'
+        }}>
           <Navigation />
-          <Routes>
-            <Route path="/" element={<RandomCatsPage />} />
-            <Route path="/breeds" element={<BreedsPage />} />
-            <Route path="/favorites" element={<FavoritesPage />} />
-            {/* Handle legacy cat routes and direct image access */}
-            <Route path="/cat/:catId" element={<RandomCatsPage />} />
-          </Routes>
+          <Box component="main" sx={{ flex: 1 }}>
+            <Routes>
+              <Route path="/" element={<RandomCatsPage />} />
+              <Route path="/breeds" element={<BreedsPage />} />
+              <Route path="/favorites" element={<FavoritesPage />} />
+              {/* Handle legacy cat routes and direct image access */}
+              <Route path="/cat/:catId" element={<RandomCatsPage />} />
+            </Routes>
+          </Box>
+          <Footer />
         </Box>
       </Router>
     </ThemeProvider>

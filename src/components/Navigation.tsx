@@ -21,7 +21,18 @@ export const Navigation: React.FC = () => {
   ];
 
   return (
-    <AppBar position="static" color="default" elevation={2} sx={{ mb: 4 }}>
+    <AppBar 
+      position="sticky" 
+      color="default" 
+      elevation={2} 
+      sx={{ 
+        mb: 4,
+        top: 0,
+        zIndex: (theme) => theme.zIndex.appBar,
+        backdropFilter: 'blur(8px)',
+        backgroundColor: 'rgba(255, 255, 255, 0.9)'
+      }}
+    >
       <Container maxWidth="xl">
         <Toolbar disableGutters>
           <Pets sx={{ display: { xs: 'none', md: 'flex' }, mr: 1, color: 'primary.main' }} />
