@@ -23,11 +23,11 @@ export const FavoritesPage: React.FC = () => {
 
   // Check if we have a cat ID in the URL
   const urlParams = new URLSearchParams(location.search);
-  const catIdFromUrl = urlParams.get('cat');
+  const catIdFromUrl = urlParams.get('imgId');
 
   const handleCatClick = (cat: FavoriteCat) => {
     setSelectedCat(cat);
-    navigate(`/favorites?cat=${cat.id}`, { replace: true });
+    navigate(`/favorites?imgId=${cat.id}`, { replace: true });
   };
 
   const handleCloseModal = () => {

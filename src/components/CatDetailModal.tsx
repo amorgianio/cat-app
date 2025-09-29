@@ -7,9 +7,10 @@ import {
   Chip,
   CircularProgress,
   Alert,
-  CardMedia
+  CardMedia,
+  Divider
 } from '@mui/material';
-import { Favorite, FavoriteBorder, Launch } from '@mui/icons-material';
+import { Favorite, FavoriteBorder, Launch, Category, Share } from '@mui/icons-material';
 import { Modal } from './Modal';
 import { useCatById, useFavorites } from '../hooks/useCats';
 import { sxStyles } from './StyledComponents';
@@ -47,6 +48,54 @@ export const CatDetailModal: React.FC<CatDetailModalProps> = ({
       removeFromFavorites(cat.id);
     } else {
       addToFavorites(cat);
+      // Optional: Show success message with link to favorites
+      setTimeout(() => {
+        if (window.confirm('Cat added to favorites! Would you like to view all your favorites?')) {
+          handleClose();
+          navigate('/favorites');
+        }
+      }, 500);
+    }
+  };
+
+  const handleShareClick = async () => {
+    const shareUrl = `${window.location.origin}?imgId=${cat?.id}`;
+    
+    if (navigator.share) {
+      try {
+        await navigator.share({
+          title: `Check out this ${breed?.name || 'cute cat'}!`,
+          text: `Look at this adorable ${breed?.name || 'cat'} I found!`,
+          url: shareUrl,
+        });
+      } catch (err) {
+        // Fallback to clipboard
+        copyToClipboard(shareUrl);
+      }
+    } else {
+      copyToClipboard(shareUrl);
+    }
+  };
+
+  const copyToClipboard = (url: string) => {
+    navigator.clipboard.writeText(url).then(() => {
+      alert('Link copied to clipboard!');
+    }).catch(() => {
+      // Fallback for older browsers
+      const textArea = document.createElement('textarea');
+      textArea.value = url;
+      document.body.appendChild(textArea);
+      textArea.select();
+      document.execCommand('copy');
+      document.body.removeChild(textArea);
+      alert('Link copied to clipboard!');
+    });
+  };
+
+  const handleViewBreed = () => {
+    if (breed) {
+      handleClose();
+      navigate(`/breeds?breedId=${breed.id}`);
     }
   };
 
@@ -97,6 +146,10 @@ export const CatDetailModal: React.FC<CatDetailModalProps> = ({
               {breed.name}
             </Typography>
             
+            <Typography variant="caption" color="text.secondary" sx={{ mb: 2, display: 'block' }}>
+              💡 Share this URL with friends to show them this exact cat!
+            </Typography>
+            
             <Box sx={{ mb: 2 }}>
               <Typography variant="body1" sx={{ mb: 1 }}>
                 <strong>Origin:</strong> {breed.origin}
@@ -131,6 +184,12 @@ export const CatDetailModal: React.FC<CatDetailModalProps> = ({
               </Box>
             )}
             
+            <Divider sx={{ my: 2 }} />
+            
+            <Typography variant="h6" gutterBottom>
+              What would you like to do?
+            </Typography>
+            
             <Box sx={{ display: 'flex', gap: 2, alignItems: 'center', flexWrap: 'wrap' }}>
               <Button 
                 variant="contained"
@@ -139,6 +198,24 @@ export const CatDetailModal: React.FC<CatDetailModalProps> = ({
                 color={isFavorite(cat.id) ? "error" : "primary"}
               >
                 {isFavorite(cat.id) ? 'Remove from Favorites' : 'Add to Favorites'}
+              </Button>
+              
+              <Button 
+                variant="outlined"
+                startIcon={<Category />}
+                onClick={handleViewBreed}
+                color="secondary"
+              >
+                View All {breed.name}s
+              </Button>
+              
+              <Button 
+                variant="outlined"
+                startIcon={<Share />}
+                onClick={handleShareClick}
+                color="primary"
+              >
+                Share Cat
               </Button>
               
               {breed.wikipedia_url && (
@@ -159,18 +236,40 @@ export const CatDetailModal: React.FC<CatDetailModalProps> = ({
             <Typography variant="h4" component="h3" gutterBottom>
               Beautiful Cat
             </Typography>
+            
+            <Typography variant="caption" color="text.secondary" sx={{ mb: 2, display: 'block' }}>
+              💡 Share this URL with friends to show them this exact cat!
+            </Typography>
+            
             <Typography variant="body1" paragraph>
               No breed information available for this adorable cat.
             </Typography>
             
-            <Button 
-              variant="contained"
-              startIcon={isFavorite(cat.id) ? <Favorite /> : <FavoriteBorder />}
-              onClick={handleFavoriteClick}
-              color={isFavorite(cat.id) ? "error" : "primary"}
-            >
-              {isFavorite(cat.id) ? 'Remove from Favorites' : 'Add to Favorites'}
-            </Button>
+            <Divider sx={{ my: 2 }} />
+            
+            <Typography variant="h6" gutterBottom>
+              What would you like to do?
+            </Typography>
+            
+            <Box sx={{ display: 'flex', gap: 2, alignItems: 'center', flexWrap: 'wrap' }}>
+              <Button 
+                variant="contained"
+                startIcon={isFavorite(cat.id) ? <Favorite /> : <FavoriteBorder />}
+                onClick={handleFavoriteClick}
+                color={isFavorite(cat.id) ? "error" : "primary"}
+              >
+                {isFavorite(cat.id) ? 'Remove from Favorites' : 'Add to Favorites'}
+              </Button>
+              
+              <Button 
+                variant="outlined"
+                startIcon={<Share />}
+                onClick={handleShareClick}
+                color="primary"
+              >
+                Share Cat
+              </Button>
+            </Box>
           </Box>
         )}
       </Box>

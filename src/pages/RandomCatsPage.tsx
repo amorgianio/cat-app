@@ -22,14 +22,14 @@ export const RandomCatsPage: React.FC = () => {
   const { cats, loading, error, loadMore } = useRandomCats();
   const [selectedCat, setSelectedCat] = useState<CatImage | null>(null);
 
-  // Check if we have a cat ID in the URL
+  // Check if we have a cat ID in the URL - using imgId parameter as specified
   const urlParams = new URLSearchParams(location.search);
-  const catIdFromUrl = urlParams.get('cat');
+  const catIdFromUrl = urlParams.get('imgId');
 
   const handleCatClick = (cat: CatImage) => {
     setSelectedCat(cat);
-    // Update URL to allow sharing
-    navigate(`?cat=${cat.id}`, { replace: true });
+    // Update URL to allow sharing - using imgId parameter as specified
+    navigate(`?imgId=${cat.id}`, { replace: true });
   };
 
   const handleCloseModal = () => {

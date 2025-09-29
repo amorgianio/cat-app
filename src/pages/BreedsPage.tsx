@@ -1,5 +1,5 @@
-import React, { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+import React, { useState, useEffect, useRef } from 'react';
+import { useNavigate, useLocation } from 'react-router-dom';
 import { 
   Container, 
   Typography, 
@@ -19,14 +19,45 @@ import { Breed, CatImage } from '../types';
 
 export const BreedsPage: React.FC = () => {
   const navigate = useNavigate();
+  const location = useLocation();
   const { breeds, loading: breedsLoading, error: breedsError } = useBreeds();
   const [selectedBreed, setSelectedBreed] = useState<Breed | null>(null);
   const [selectedCat, setSelectedCat] = useState<CatImage | null>(null);
+  const breedRefs = useRef<{ [key: string]: HTMLElement | null }>({});
   
   const { 
     images: breedImages, 
     loading: imagesLoading 
   } = useBreedImages(selectedBreed?.id || null);
+
+  // Check if we need to focus on a specific breed from URL parameter
+  useEffect(() => {
+    const urlParams = new URLSearchParams(location.search);
+    const breedId = urlParams.get('breedId');
+    
+    if (breedId && breeds.length > 0) {
+      const breed = breeds.find(b => b.id === breedId);
+      if (breed) {
+        // Scroll to the breed card
+        const breedElement = breedRefs.current[breedId];
+        if (breedElement) {
+          breedElement.scrollIntoView({ 
+            behavior: 'smooth', 
+            block: 'center' 
+          });
+          // Optional: Add a highlight effect
+          breedElement.style.boxShadow = '0 0 20px rgba(25, 118, 210, 0.5)';
+          setTimeout(() => {
+            breedElement.style.boxShadow = '';
+          }, 3000);
+        }
+      }
+    }
+  }, [breeds, location.search]);
+
+  const setBreedRef = (breedId: string) => (el: HTMLElement | null) => {
+    breedRefs.current[breedId] = el;
+  };
 
   const handleBreedClick = (breed: Breed) => {
     setSelectedBreed(breed);
@@ -38,7 +69,7 @@ export const BreedsPage: React.FC = () => {
 
   const handleCatClick = (cat: CatImage) => {
     setSelectedCat(cat);
-    navigate(`?cat=${cat.id}`, { replace: true });
+    navigate(`/breeds?imgId=${cat.id}`, { replace: true });
   };
 
   const handleCatModalClose = () => {
@@ -89,6 +120,7 @@ export const BreedsPage: React.FC = () => {
           {breeds.map((breed: Breed) => (
             <Grid item xs={12} sm={6} md={4} key={breed.id}>
               <Card 
+                ref={setBreedRef(breed.id)}
                 sx={{ 
                   cursor: 'pointer',
                   height: '100%',

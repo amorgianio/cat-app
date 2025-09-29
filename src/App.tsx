@@ -23,6 +23,7 @@ const App: React.FC = () => {
             <Route path="/" element={<RandomCatsPage />} />
             <Route path="/breeds" element={<BreedsPage />} />
             <Route path="/favorites" element={<FavoritesPage />} />
+            {/* Handle legacy cat routes and direct image access */}
             <Route path="/cat/:catId" element={<RandomCatsPage />} />
           </Routes>
         </Box>
