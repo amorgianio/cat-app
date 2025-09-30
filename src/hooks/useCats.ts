@@ -4,6 +4,7 @@ import { catApi, favoritesStorage } from '../services/catApi';
 import { PERFORMANCE_CONFIG, PerformanceMonitor } from '../config/performance';
 
 // Hook for managing random cat images with performance optimizations
+// Uses AbortController to prevent duplicate API calls in React Strict Mode
 export const useRandomCats = () => {
   const [cats, setCats] = useState<CatImage[]>([]);
   const [loading, setLoading] = useState(false);
@@ -11,12 +12,23 @@ export const useRandomCats = () => {
   const [totalLoaded, setTotalLoaded] = useState(0);
   const [hasReachedLimit, setHasReachedLimit] = useState(false);
 
-  const loadCats = async (limit: number = PERFORMANCE_CONFIG.LOAD_BATCH_SIZE, append: boolean = false) => {
+  const loadCats = async (
+    limit: number = PERFORMANCE_CONFIG.LOAD_BATCH_SIZE, 
+    append: boolean = false,
+    signal?: AbortSignal
+  ) => {
     setLoading(true);
     setError(null);
     
     try {
-      const newCats = await catApi.getRandomCats(limit);
+      // Pass AbortSignal to API call
+      const newCats = await catApi.getRandomCats(limit, signal);
+      
+      // Check if request was aborted before updating state
+      if (signal?.aborted) {
+        console.log('Request was aborted, skipping state update');
+        return;
+      }
       
       setCats((prev: CatImage[]) => {
         let updatedCats: CatImage[];
@@ -49,15 +61,31 @@ export const useRandomCats = () => {
       }
       
     } catch (err) {
+      // Don't set error if request was aborted (expected behavior)
+      if (signal?.aborted || (err as Error)?.name === 'AbortError') {
+        console.log('Request aborted by cleanup');
+        return;
+      }
       setError('Failed to load cats. Please try again.');
       console.error('Error loading cats:', err);
     } finally {
-      setLoading(false);
+      // Only set loading to false if request wasn't aborted
+      if (!signal?.aborted) {
+        setLoading(false);
+      }
     }
   };
 
   useEffect(() => {
-    loadCats();
+    // Create AbortController to handle React Strict Mode double calls
+    const abortController = new AbortController();
+    
+    loadCats(PERFORMANCE_CONFIG.LOAD_BATCH_SIZE, false, abortController.signal);
+    
+    // Cleanup function to abort request if component unmounts or effect re-runs
+    return () => {
+      abortController.abort();
+    };
   }, []);
 
   // Memoize expensive functions to prevent recreation

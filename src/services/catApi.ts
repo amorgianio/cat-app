@@ -86,10 +86,12 @@ const validateInput = {
 };
 
 export const catApi = {
-  // Get random cat images with input validation
-  getRandomCats: async (limit: number = 10): Promise<CatImage[]> => {
+  // Get random cat images with input validation and AbortSignal support
+  getRandomCats: async (limit: number = 10, signal?: AbortSignal): Promise<CatImage[]> => {
     const safeLimit = validateInput.limit(limit);
-    const response = await api.get(`/images/search?limit=${safeLimit}&has_breeds=1`);
+    const response = await api.get(`/images/search?limit=${safeLimit}&has_breeds=1`, {
+      signal
+    });
     return response.data;
   },
 

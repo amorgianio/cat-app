@@ -37,7 +37,7 @@ export const RandomCatsPage: React.FC = memo(() => {
   const urlParams = new URLSearchParams(location.search);
   const catIdFromUrl = urlParams.get('imgId');
 
-  // 🚀 Memoize event handlers
+  //  Memoize event handlers
   const handleCatClick = useCallback((cat: CatImage) => {
     setSelectedCat(cat);
     // Update URL to allow sharing - using imgId parameter as specified
