@@ -17,6 +17,7 @@ import { CatDetailModal } from '../components/CatDetailModal';
 import { CatGridSkeleton } from '../components/CatCardSkeleton';
 import { useRandomCats } from '../hooks/useCats';
 import { usePerformanceWarnings } from '../hooks/usePerformance';
+import { useDocumentTitle, createTitle, PAGE_TITLES } from '../hooks/useDocumentTitle';
 import { PERFORMANCE_CONFIG } from '../config/performance';
 import { CatImage } from '../types';
 import { sxStyles } from '../components/StyledComponents';
@@ -26,6 +27,9 @@ export const RandomCatsPage: React.FC = memo(() => {
   const location = useLocation();
   const { cats, loading, error, loadMore, totalLoaded, hasReachedLimit, canLoadMore } = useRandomCats();
   const [selectedCat, setSelectedCat] = useState<CatImage | null>(null);
+  
+  // Only updates document.title (no memory overhead)
+  useDocumentTitle(createTitle(PAGE_TITLES.HOME));
   const { 
     showMemoryWarning, 
     showPerformanceInfo, 

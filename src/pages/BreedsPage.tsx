@@ -17,6 +17,7 @@ import { CatCard } from '../components/CatCard';
 import { CatDetailModal } from '../components/CatDetailModal';
 import { CatCardSkeleton } from '../components/CatCardSkeleton';
 import { BreedGridSkeleton } from '../components/BreedCardSkeleton';
+import { useDocumentTitle, createTitle, PAGE_TITLES } from '../hooks/useDocumentTitle';
 import { DIMENSIONS } from '../components/StyledComponents';
 import { useBreeds, useBreedImages } from '../hooks/useCats';
 import { Breed, CatImage } from '../types';
@@ -28,6 +29,12 @@ export const BreedsPage: React.FC = () => {
   const [selectedBreed, setSelectedBreed] = useState<Breed | null>(null);
   const [selectedCat, setSelectedCat] = useState<CatImage | null>(null);
   const breedRefs = useRef<{ [key: string]: HTMLElement | null }>({});
+  
+  // Dynamic title based on selected breed
+  const pageTitle = selectedBreed 
+    ? `${selectedBreed.name} Cat Breed - ${PAGE_TITLES.BREEDS}`
+    : PAGE_TITLES.BREEDS;
+  useDocumentTitle(createTitle(pageTitle));
   
   const { 
     images: breedImages, 

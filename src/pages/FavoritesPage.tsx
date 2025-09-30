@@ -12,6 +12,7 @@ import { Clear } from '@mui/icons-material';
 import { CatCard } from '../components/CatCard';
 import { CatDetailModal } from '../components/CatDetailModal';
 import { useFavorites } from '../hooks/useCats';
+import { useDocumentTitle, createTitle, PAGE_TITLES } from '../hooks/useDocumentTitle';
 import { FavoriteCat, CatImage } from '../types';
 
 export const FavoritesPage: React.FC = () => {
@@ -19,6 +20,9 @@ export const FavoritesPage: React.FC = () => {
   const location = useLocation();
   const { favorites, removeFromFavorites } = useFavorites();
   const [selectedCat, setSelectedCat] = useState<FavoriteCat | null>(null);
+  
+  // Dynamic title based on favorites count
+  useDocumentTitle(createTitle(`${PAGE_TITLES.FAVORITES} (${favorites.length})`));
 
   // Check if we have a cat ID in the URL
   const urlParams = new URLSearchParams(location.search);

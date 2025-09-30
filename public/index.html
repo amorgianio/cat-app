@@ -4,17 +4,81 @@
     <meta charset="utf-8" />
     <link rel="icon" href="%PUBLIC_URL%/favicon.ico" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <meta name="theme-color" content="#000000" />
-    <meta
-      name="description"
-      content="Cat Lover App - Browse and favorite your favorite cats"
-    />
+    <meta name="theme-color" content="#ff6b6b" />
+    
+    <!-- Enhanced SEO Meta Tags -->
+    <title>Cat Lover App - Browse Thousands of Adorable Cat Photos & Breeds</title>
+    <meta name="description" content="Discover thousands of adorable cat photos, explore 40+ cat breeds, and save your favorites. Free cat image gallery with detailed breed information from TheCatAPI." />
+    <meta name="keywords" content="cats, cat photos, cat breeds, kittens, pet photos, cat gallery, TheCatAPI, cat lovers, free cat images" />
+    <meta name="author" content="Cat Lover App" />
+    <meta name="robots" content="index, follow" />
+    <link rel="canonical" href="https://cat-lover-app.vercel.app" />
+    
+    <!-- Open Graph for Social Media Sharing -->
+    <meta property="og:type" content="website" />
+    <meta property="og:site_name" content="Cat Lover App" />
+    <meta property="og:title" content="Cat Lover App - Browse Adorable Cat Photos" />
+    <meta property="og:description" content="Discover thousands of adorable cat photos and explore different breeds. Save your favorites and learn about cat characteristics!" />
+    <meta property="og:image" content="%PUBLIC_URL%/og-cat-image.jpg" />
+    <meta property="og:image:width" content="1200" />
+    <meta property="og:image:height" content="630" />
+    <meta property="og:url" content="https://cat-lover-app.vercel.app" />
+    <meta property="og:locale" content="en_US" />
+    
+    <!-- Twitter Cards -->
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:site" content="@CatLoverApp" />
+    <meta name="twitter:title" content="Cat Lover App - Browse Adorable Cat Photos" />
+    <meta name="twitter:description" content="Discover thousands of adorable cat photos and explore different breeds" />
+    <meta name="twitter:image" content="%PUBLIC_URL%/twitter-cat-image.jpg" />
+    <meta name="twitter:image:alt" content="Adorable cat photos from Cat Lover App" />
+    
+    <!-- Performance & Prefetching -->
+    <link rel="preconnect" href="https://api.thecatapi.com" />
+    <link rel="dns-prefetch" href="https://cdn2.thecatapi.com" />
+    
     <link rel="apple-touch-icon" href="%PUBLIC_URL%/logo192.png" />
     <link rel="manifest" href="%PUBLIC_URL%/manifest.json" />
-    <title>Cat Lover App</title>
   </head>
   <body>
-    <noscript>You need to enable JavaScript to run this app.</noscript>
+    <noscript>
+      <div style="text-align: center; padding: 50px; font-family: Arial, sans-serif;">
+        <h1>🐱 Cat Lover App</h1>
+        <p>You need to enable JavaScript to run this app.</p>
+        <p>Browse thousands of adorable cat photos and learn about different breeds!</p>
+      </div>
+    </noscript>
+    
+    <!-- Structured Data for Search Engines  -->
+    <script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@type": "WebApplication",
+      "name": "Cat Lover App",
+      "description": "Browse and favorite adorable cat photos with detailed breed information",
+      "url": "https://cat-lover-app.vercel.app",
+      "applicationCategory": "Entertainment",
+      "operatingSystem": "Web Browser",
+      "browserRequirements": "Requires JavaScript",
+      "offers": {
+        "@type": "Offer",
+        "price": "0",
+        "priceCurrency": "USD"
+      },
+      "featureList": [
+        "Browse random cat photos",
+        "Explore cat breeds",
+        "Save favorite cats",
+        "View breed characteristics",
+        "High-quality cat images"
+      ],
+      "author": {
+        "@type": "Organization",
+        "name": "Cat Lover App"
+      }
+    }
+    </script>
+    
     <div id="root"></div>
   </body>
 </html>
