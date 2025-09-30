@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useMemo } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import { 
   Box,
@@ -16,23 +16,39 @@ import { Favorite, FavoriteBorder, Launch, Category, Share } from '@mui/icons-ma
 import { Modal } from './Modal';
 import { useCatById, useFavorites } from '../hooks/useCats';
 import { sxStyles } from './StyledComponents';
+import { CatImage } from '../types';
 
 interface CatDetailModalProps {
   isOpen: boolean;
   onClose: () => void;
   catId?: string;
+  existingCats?: CatImage[]; // Pass existing cats to avoid duplicate API calls
 }
 
 export const CatDetailModal: React.FC<CatDetailModalProps> = ({ 
   isOpen, 
   onClose,
-  catId: propCatId 
+  catId: propCatId,
+  existingCats = []
 }) => {
   const { catId: paramCatId } = useParams<{ catId: string }>();
   const navigate = useNavigate();
   const catId = propCatId || paramCatId;
   
-  const { cat, loading, error } = useCatById(catId || null);
+  // OPTIMIZATION: First check if cat exists in already loaded cats
+  const existingCat = useMemo(() => 
+    existingCats.find(cat => cat.id === catId), 
+    [existingCats, catId]
+  );
+  
+  // Only make API call if cat is not already loaded
+  const { cat: fetchedCat, loading, error } = useCatById(
+    existingCat ? null : (catId || null)
+  );
+  
+  // Use existing cat if available, otherwise use fetched cat
+  const cat = existingCat || fetchedCat;
+  
   const { addToFavorites, removeFromFavorites, isFavorite } = useFavorites();
 
   const handleClose = () => {
@@ -103,9 +119,9 @@ export const CatDetailModal: React.FC<CatDetailModalProps> = ({
 
   const breed = cat?.breeds?.[0];
 
-  if (loading) {
+  if (loading && !existingCat) {
     return (
-      <Modal isOpen={isOpen} onClose={handleClose} maxWidth="md">
+      <Modal isOpen={isOpen} onClose={handleClose} maxWidth="md" title="Loading...">
         <Box>
           {/* Image Skeleton - Exact same max height as actual modal image */}
           <Skeleton 
@@ -268,7 +284,7 @@ export const CatDetailModal: React.FC<CatDetailModalProps> = ({
 
   if (error || !cat) {
     return (
-      <Modal isOpen={isOpen} onClose={handleClose}>
+      <Modal isOpen={isOpen} onClose={handleClose} title="Error">
         <Box sx={sxStyles.modalBox}>
           <Alert severity="error">
             {error || 'Cat not found'}
@@ -279,7 +295,12 @@ export const CatDetailModal: React.FC<CatDetailModalProps> = ({
   }
 
   return (
-    <Modal isOpen={isOpen} onClose={handleClose} maxWidth="md">
+    <Modal 
+      isOpen={isOpen} 
+      onClose={handleClose} 
+      maxWidth="md"
+      title={breed?.name || 'Cat Details'}
+    >
       <Box>
         <CardMedia
           component="img"
@@ -294,10 +315,6 @@ export const CatDetailModal: React.FC<CatDetailModalProps> = ({
         
         {breed && (
           <Box sx={sxStyles.modalBox}>
-            <Typography variant="h4" component="h3" gutterBottom>
-              {breed.name}
-            </Typography>
-            
             <Typography variant="caption" color="text.secondary" sx={{ mb: 2, display: 'block' }}>
               💡 Share this URL with friends to show them this exact cat!
             </Typography>

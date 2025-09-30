@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback, useMemo } from 'react';
 import { CatImage, Breed, FavoriteCat } from '../types';
 import { catApi, favoritesStorage } from '../services/catApi';
 import { PERFORMANCE_CONFIG, PerformanceMonitor } from '../config/performance';
@@ -26,7 +26,7 @@ export const useRandomCats = () => {
           
           // Memory management: Keep only recent cats if we exceed threshold
           if (updatedCats.length > PERFORMANCE_CONFIG.AUTO_CLEANUP_THRESHOLD) {
-            console.log(`🧹 Memory cleanup: Removing ${updatedCats.length - PERFORMANCE_CONFIG.MAX_CATS_IN_MEMORY} older cats`);
+            console.log(`Memory cleanup: Removing ${updatedCats.length - PERFORMANCE_CONFIG.MAX_CATS_IN_MEMORY} older cats`);
             updatedCats = updatedCats.slice(-PERFORMANCE_CONFIG.MAX_CATS_IN_MEMORY);
             
             // Log performance metrics
@@ -60,18 +60,25 @@ export const useRandomCats = () => {
     loadCats();
   }, []);
 
-  const loadMore = () => {
+  // Memoize expensive functions to prevent recreation
+  const loadMore = useCallback(() => {
     if (!hasReachedLimit) {
       loadCats(PERFORMANCE_CONFIG.LOAD_BATCH_SIZE, true);
     }
-  };
+  }, [hasReachedLimit]);
 
-  const resetAndReload = () => {
+  const resetAndReload = useCallback(() => {
     setCats([]);
     setTotalLoaded(0);
     setHasReachedLimit(false);
     loadCats();
-  };
+  }, []);
+
+  // Memoize computed values
+  const canLoadMore = useMemo(() => 
+    !loading && !hasReachedLimit && totalLoaded < PERFORMANCE_CONFIG.SOFT_LIMIT_TOTAL,
+    [loading, hasReachedLimit, totalLoaded]
+  );
 
   return { 
     cats, 
@@ -81,7 +88,7 @@ export const useRandomCats = () => {
     reload: resetAndReload,
     totalLoaded,
     hasReachedLimit,
-    canLoadMore: !hasReachedLimit && !loading
+    canLoadMore
   };
 };
 
@@ -150,24 +157,26 @@ export const useBreedImages = (breedId: string | null) => {
 export const useFavorites = () => {
   const [favorites, setFavorites] = useState<FavoriteCat[]>([]);
 
-  const loadFavorites = () => {
+  // Memoize loadFavorites to prevent recreation
+  const loadFavorites = useCallback(() => {
     const favs = favoritesStorage.getFavorites();
     setFavorites(favs);
-  };
+  }, []);
 
   useEffect(() => {
     loadFavorites();
-  }, []);
+  }, [loadFavorites]);
 
-  const addToFavorites = (cat: CatImage) => {
+  // Memoize favorite operations
+  const addToFavorites = useCallback((cat: CatImage) => {
     favoritesStorage.addToFavorites(cat);
     loadFavorites();
-  };
+  }, [loadFavorites]);
 
-  const removeFromFavorites = (catId: string) => {
+  const removeFromFavorites = useCallback((catId: string) => {
     favoritesStorage.removeFromFavorites(catId);
     loadFavorites();
-  };
+  }, [loadFavorites]);
 
   const isFavorite = (catId: string) => {
     return favoritesStorage.isFavorite(catId);

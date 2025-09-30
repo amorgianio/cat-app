@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useMemo, memo } from 'react';
 import { Link, useLocation } from 'react-router-dom';
 import { 
   AppBar, 
@@ -11,14 +11,15 @@ import {
 import { Pets } from '@mui/icons-material';
 import { sxStyles } from './StyledComponents';
 
-export const Navigation: React.FC = () => {
-  const location = useLocation();
+// Memoize static navigation items outside component to prevent recreation
+const NAV_ITEMS = [
+  { path: '/', label: 'Random Cats' },
+  { path: '/breeds', label: 'Breeds' },
+  { path: '/favorites', label: 'Favorites' }
+] as const;
 
-  const navItems = [
-    { path: '/', label: 'Random Cats' },
-    { path: '/breeds', label: 'Breeds' },
-    { path: '/favorites', label: 'Favorites' }
-  ];
+export const Navigation: React.FC = memo(() => {
+  const location = useLocation();
 
   return (
     <AppBar 
@@ -66,7 +67,7 @@ export const Navigation: React.FC = () => {
           </Typography>
 
           <Box sx={{ flexGrow: 1, display: 'flex', justifyContent: 'flex-end' }}>
-            {navItems.map((item) => (
+            {NAV_ITEMS.map((item) => (
               <Button
                 key={item.path}
                 component={Link}
@@ -81,4 +82,7 @@ export const Navigation: React.FC = () => {
       </Container>
     </AppBar>
   );
-};
+});
+
+// Add display name for debugging
+Navigation.displayName = 'Navigation';

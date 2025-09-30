@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useCallback, useMemo, memo } from 'react';
 import { 
   Card, 
   CardMedia, 
@@ -19,7 +19,7 @@ interface CatCardProps {
   showBreedInfo?: boolean;
 }
 
-export const CatCard: React.FC<CatCardProps> = ({ 
+export const CatCard: React.FC<CatCardProps> = memo(({ 
   cat, 
   onClick, 
   showBreedInfo = true 
@@ -28,16 +28,22 @@ export const CatCard: React.FC<CatCardProps> = ({
   const [imageLoaded, setImageLoaded] = useState(false);
   const [imageError, setImageError] = useState(false);
 
-  const handleFavoriteClick = (e: React.MouseEvent) => {
+  // Simple computations - no need for memoization
+  const breed = cat.breeds?.[0];
+  const isCurrentlyFavorite = isFavorite(cat.id);
+
+  // Keep useCallback only for complex handlers with multiple dependencies
+  const handleFavoriteClick = useCallback((e: React.MouseEvent) => {
     e.stopPropagation();
     
-    if (isFavorite(cat.id)) {
+    if (isCurrentlyFavorite) {
       removeFromFavorites(cat.id);
     } else {
       addToFavorites(cat);
     }
-  };
+  }, [isCurrentlyFavorite, removeFromFavorites, addToFavorites, cat]);
 
+  // Simple handlers - no need for useCallback overhead
   const handleImageLoad = () => {
     setImageLoaded(true);
   };
@@ -47,12 +53,14 @@ export const CatCard: React.FC<CatCardProps> = ({
     setImageLoaded(true); // Stop showing skeleton even on error
   };
 
-  const breed = cat.breeds?.[0];
+  const handleCardClick = () => {
+    onClick(cat);
+  };
 
   return (
     <Card 
       sx={sxStyles.catCard}
-      onClick={() => onClick(cat)}
+      onClick={handleCardClick}
     >
       <Box sx={{ position: 'relative' }}>
         {/* Skeleton loader while image loads */}
@@ -160,4 +168,7 @@ export const CatCard: React.FC<CatCardProps> = ({
       )}
     </Card>
   );
-};
+});
+
+// Add display name for debugging
+CatCard.displayName = 'CatCard';

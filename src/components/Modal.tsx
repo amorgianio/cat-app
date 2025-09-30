@@ -2,9 +2,11 @@ import React from 'react';
 import { 
   Dialog, 
   DialogContent, 
+  DialogTitle,
   IconButton, 
   useMediaQuery, 
-  useTheme 
+  useTheme,
+  Typography 
 } from '@mui/material';
 import { Close } from '@mui/icons-material';
 
@@ -13,13 +15,15 @@ interface ModalProps {
   onClose: () => void;
   children: React.ReactNode;
   maxWidth?: 'xs' | 'sm' | 'md' | 'lg' | 'xl';
+  title?: string;
 }
 
 export const Modal: React.FC<ModalProps> = ({ 
   isOpen, 
   onClose, 
   children,
-  maxWidth = 'md'
+  maxWidth = 'md',
+  title
 }) => {
   const theme = useTheme();
   const fullScreen = useMediaQuery(theme.breakpoints.down('md'));
@@ -38,6 +42,19 @@ export const Modal: React.FC<ModalProps> = ({
         }
       }}
     >
+      {title && (
+        <DialogTitle sx={{ 
+          pr: 6, // Make room for close button
+          pb: 1,
+          fontSize: '1.5rem',
+          fontWeight: 600
+        }}>
+          <Typography variant="h5" component="h2">
+            {title}
+          </Typography>
+        </DialogTitle>
+      )}
+      
       <IconButton
         aria-label="close"
         onClick={onClose}
@@ -55,7 +72,7 @@ export const Modal: React.FC<ModalProps> = ({
         <Close />
       </IconButton>
       
-      <DialogContent sx={{ p: 0 }}>
+      <DialogContent sx={{ p: title ? 0 : 0 }}>
         {children}
       </DialogContent>
     </Dialog>

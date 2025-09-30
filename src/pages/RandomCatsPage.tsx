@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useCallback, useMemo, memo } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { 
   Container, 
@@ -21,7 +21,7 @@ import { PERFORMANCE_CONFIG } from '../config/performance';
 import { CatImage } from '../types';
 import { sxStyles } from '../components/StyledComponents';
 
-export const RandomCatsPage: React.FC = () => {
+export const RandomCatsPage: React.FC = memo(() => {
   const navigate = useNavigate();
   const location = useLocation();
   const { cats, loading, error, loadMore, totalLoaded, hasReachedLimit, canLoadMore } = useRandomCats();
@@ -33,23 +33,29 @@ export const RandomCatsPage: React.FC = () => {
     hidePerformanceInfo 
   } = usePerformanceWarnings(cats.length, totalLoaded);
 
-  // Check if we have a cat ID in the URL - using imgId parameter as specified
+  // Simple URL parsing - URLSearchParams is already fast
   const urlParams = new URLSearchParams(location.search);
   const catIdFromUrl = urlParams.get('imgId');
 
-  const handleCatClick = (cat: CatImage) => {
+  // 🚀 Memoize event handlers
+  const handleCatClick = useCallback((cat: CatImage) => {
     setSelectedCat(cat);
     // Update URL to allow sharing - using imgId parameter as specified
     navigate(`?imgId=${cat.id}`, { replace: true });
-  };
+  }, [navigate]);
 
-  const handleCloseModal = () => {
+  const handleCloseModal = useCallback(() => {
     setSelectedCat(null);
     navigate('/', { replace: true });
+  }, [navigate]);
+
+  // Simple handlers and computed values - no memoization needed
+  const handleRefresh = () => {
+    window.location.reload();
   };
 
-  // If there's a cat ID in URL but no selected cat, we should show the modal
   const shouldShowModal = selectedCat !== null || catIdFromUrl !== null;
+  const hasNoCats = cats.length === 0 && !loading;
 
   if (error) {
     return (
@@ -93,7 +99,7 @@ export const RandomCatsPage: React.FC = () => {
         </Alert>
       </Collapse>
       
-      {cats.length === 0 && !loading ? (
+      {hasNoCats ? (
         <Box sx={sxStyles.centerBox}>
           <Typography variant="h4" color="text.secondary" gutterBottom>
             No cats found
@@ -101,7 +107,7 @@ export const RandomCatsPage: React.FC = () => {
           <Typography variant="body1" color="text.secondary" sx={{ mb: 3 }}>
             Try refreshing the page or check your internet connection.
           </Typography>
-          <Button variant="contained" startIcon={<Refresh />} onClick={() => window.location.reload()}>
+          <Button variant="contained" startIcon={<Refresh />} onClick={handleRefresh}>
             Refresh
           </Button>
         </Box>
@@ -293,7 +299,11 @@ export const RandomCatsPage: React.FC = () => {
         isOpen={shouldShowModal}
         onClose={handleCloseModal}
         catId={selectedCat?.id || catIdFromUrl || undefined}
+        existingCats={cats}
       />
     </Container>
   );
-};
+});
+
+// Add display name for debugging
+RandomCatsPage.displayName = 'RandomCatsPage';
