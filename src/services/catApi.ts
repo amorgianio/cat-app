@@ -4,10 +4,20 @@ import { CatImage, Breed, FavoriteCat } from '../types';
 // Security: Use environment variables for sensitive data
 const API_KEY = process.env.REACT_APP_CAT_API_KEY;
 const BASE_URL = process.env.REACT_APP_CAT_API_BASE_URL || 'https://api.thecatapi.com/v1';
+const ENVIRONMENT = process.env.REACT_APP_ENVIRONMENT || 'development';
+const DEBUG_MODE = process.env.REACT_APP_DEBUG_MODE === 'true';
+const PERFORMANCE_LOGGING = process.env.REACT_APP_PERFORMANCE_LOGGING === 'true';
 
 // Validate required environment variables
 if (!API_KEY) {
   console.error('Missing REACT_APP_CAT_API_KEY environment variable');
+}
+
+// Environment info logging (development only)
+if (DEBUG_MODE) {
+  console.log(`🐱 Cat API Environment: ${ENVIRONMENT}`);
+  console.log(`🔧 Debug Mode: ${DEBUG_MODE}`);
+  console.log(`📊 Performance Logging: ${PERFORMANCE_LOGGING}`);
 }
 
 const api = axios.create({
@@ -23,9 +33,9 @@ const api = axios.create({
 // Security: Add request/response interceptors
 api.interceptors.request.use(
   (config: InternalAxiosRequestConfig) => {
-    // Log requests in development (remove in production)
-    if (process.env.NODE_ENV === 'development') {
-      console.log(`API Request: ${config.method?.toUpperCase()} ${config.url}`);
+    // Log requests based on environment settings
+    if (DEBUG_MODE) {
+      console.log(`🌐 API Request: ${config.method?.toUpperCase()} ${config.url}`);
     }
     return config;
   },

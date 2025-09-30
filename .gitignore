@@ -4,9 +4,13 @@ node_modules/
 # Environment variables (contains sensitive data)
 .env
 .env.local
+.env.development
 .env.development.local
-.env.test.local
+.env.production
 .env.production.local
+.env.test.local
+
+# Note: .env.example is NOT ignored - it's a template for developers
 
 # Build outputs
 /build
