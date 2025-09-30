@@ -130,6 +130,7 @@ export const FavoritesPage: React.FC = () => {
         isOpen={shouldShowModal}
         onClose={handleCloseModal}
         catId={selectedCat?.id || catIdFromUrl || undefined}
+        existingCats={favorites}
       />
     </Container>
   );
