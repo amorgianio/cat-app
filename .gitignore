@@ -19,6 +19,9 @@ node_modules/
 # Test coverage reports
 /coverage
 
+# Static analysis and reports
+/storybook-static
+
 # IDE files
 .vscode/
 .idea/
