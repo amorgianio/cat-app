@@ -96,4 +96,29 @@ describe(' App Component', () => {
       });
     });
   });
+
+  describe(' Component Integration', () => {
+    test('should render all essential components together', () => {
+      renderApp();
+      
+      // Verify that all main components are rendered together
+      expect(screen.getByTestId('navigation')).toBeInTheDocument();
+      expect(screen.getByTestId('footer')).toBeInTheDocument();
+      expect(screen.getByTestId('random-cats-page')).toBeInTheDocument();
+    });
+
+    test('should maintain proper component hierarchy', () => {
+      const { container } = renderApp();
+      
+      // Check that components are in the expected hierarchy
+      const nav = screen.getByTestId('navigation');
+      const main = screen.getByRole('main');
+      const footer = screen.getByTestId('footer');
+      
+      // Navigation should come before main
+      expect(nav.compareDocumentPosition(main)).toBe(Node.DOCUMENT_POSITION_FOLLOWING);
+      // Footer should come after main
+      expect(main.compareDocumentPosition(footer)).toBe(Node.DOCUMENT_POSITION_FOLLOWING);
+    });
+  });
 });

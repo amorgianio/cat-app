@@ -338,4 +338,58 @@ describe(' Component Logic Tests', () => {
       expect(getGridColumns('xl', 3)).toBe(3); // Limited by total items
     });
   });
+
+  describe('🔄 Loading & Error States', () => {
+    test('should manage loading state transitions', () => {
+      const createLoadingManager = () => {
+        let isLoading = false;
+        
+        return {
+          startLoading: () => { isLoading = true; },
+          stopLoading: () => { isLoading = false; },
+          isLoading: () => isLoading,
+          withLoading: async (asyncFn) => {
+            isLoading = true;
+            try {
+              const result = await asyncFn();
+              return result;
+            } finally {
+              isLoading = false;
+            }
+          }
+        };
+      };
+
+      const manager = createLoadingManager();
+      
+      expect(manager.isLoading()).toBe(false);
+      
+      manager.startLoading();
+      expect(manager.isLoading()).toBe(true);
+      
+      manager.stopLoading();
+      expect(manager.isLoading()).toBe(false);
+    });
+
+    test('should format error messages for display', () => {
+      const formatError = (error) => {
+        if (!error) return 'Unknown error occurred';
+        
+        if (error.message) {
+          return error.message;
+        }
+        
+        if (typeof error === 'string') {
+          return error;
+        }
+        
+        return 'An unexpected error occurred';
+      };
+
+      expect(formatError(new Error('Network error'))).toBe('Network error');
+      expect(formatError('Simple string error')).toBe('Simple string error');
+      expect(formatError(null)).toBe('Unknown error occurred');
+      expect(formatError({})).toBe('An unexpected error occurred');
+    });
+  });
 });
