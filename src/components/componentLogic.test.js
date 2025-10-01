@@ -339,7 +339,7 @@ describe(' Component Logic Tests', () => {
     });
   });
 
-  describe('🔄 Loading & Error States', () => {
+  describe(' Loading & Error States', () => {
     test('should manage loading state transitions', () => {
       const createLoadingManager = () => {
         let isLoading = false;
