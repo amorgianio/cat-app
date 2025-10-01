@@ -16,6 +16,9 @@ node_modules/
 /build
 /dist
 
+# Test coverage reports
+/coverage
+
 # IDE files
 .vscode/
 .idea/

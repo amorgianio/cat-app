@@ -53,7 +53,7 @@ export const useRandomCats = () => {
         return updatedCats;
       });
       
-      setTotalLoaded((prev: number) => prev + newCats.length);
+      setTotalLoaded((prev: number) => prev + (newCats?.length || 0));
       
       // Check if we should limit loading
       if (totalLoaded >= PERFORMANCE_CONFIG.SOFT_LIMIT_TOTAL) {
@@ -197,13 +197,21 @@ export const useFavorites = () => {
 
   // Memoize favorite operations
   const addToFavorites = useCallback((cat: CatImage) => {
-    favoritesStorage.addToFavorites(cat);
-    loadFavorites();
+    try {
+      favoritesStorage.addToFavorites(cat);
+      loadFavorites();
+    } catch (error) {
+      console.error('Failed to add to favorites:', error);
+    }
   }, [loadFavorites]);
 
   const removeFromFavorites = useCallback((catId: string) => {
-    favoritesStorage.removeFromFavorites(catId);
-    loadFavorites();
+    try {
+      favoritesStorage.removeFromFavorites(catId);
+      loadFavorites();
+    } catch (error) {
+      console.error('Failed to remove from favorites:', error);
+    }
   }, [loadFavorites]);
 
   const isFavorite = (catId: string) => {
