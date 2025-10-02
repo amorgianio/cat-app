@@ -10,7 +10,7 @@ import {
 } from '@mui/material';
 import { Favorite, FavoriteBorder } from '@mui/icons-material';
 import { CatImage as CatImageType } from '../types';
-import { useFavorites } from '../hooks/useCats';
+import { useFavoritesContext } from '../contexts/FavoritesContext';
 import { sxStyles, DIMENSIONS } from './StyledComponents';
 
 interface CatCardProps {
@@ -24,7 +24,7 @@ export const CatCard: React.FC<CatCardProps> = memo(({
   onClick, 
   showBreedInfo = true 
 }) => {
-  const { addToFavorites, removeFromFavorites, isFavorite } = useFavorites();
+  const { addToFavorites, removeFromFavorites, isFavorite } = useFavoritesContext();
   const [imageLoaded, setImageLoaded] = useState(false);
   const [imageError, setImageError] = useState(false);
 

@@ -13,7 +13,8 @@ import {
 import { DIMENSIONS } from './StyledComponents';
 import { Favorite, FavoriteBorder, Launch, Category, Share } from '@mui/icons-material';
 import { Modal } from './Modal';
-import { useCatById, useFavorites } from '../hooks/useCats';
+import { useCatById } from '../hooks/useCats';
+import { useFavoritesContext } from '../contexts/FavoritesContext';
 import { sxStyles } from './StyledComponents';
 import { CatImage } from '../types';
 
@@ -48,7 +49,7 @@ export const CatDetailModal: React.FC<CatDetailModalProps> = ({
   // Use existing cat if available, otherwise use fetched cat
   const cat = existingCat || fetchedCat;
   
-  const { addToFavorites, removeFromFavorites, isFavorite } = useFavorites();
+  const { addToFavorites, removeFromFavorites, isFavorite } = useFavoritesContext();
 
   const handleClose = () => {
     onClose();

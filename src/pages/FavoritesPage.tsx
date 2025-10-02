@@ -11,14 +11,14 @@ import {
 import { Clear } from '@mui/icons-material';
 import { CatCard } from '../components/CatCard';
 import { CatDetailModal } from '../components/CatDetailModal';
-import { useFavorites } from '../hooks/useCats';
+import { useFavoritesContext } from '../contexts/FavoritesContext';
 import { useDocumentTitle, createTitle, PAGE_TITLES } from '../hooks/useDocumentTitle';
 import { FavoriteCat, CatImage } from '../types';
 
 export const FavoritesPage: React.FC = () => {
   const navigate = useNavigate();
   const location = useLocation();
-  const { favorites, removeFromFavorites } = useFavorites();
+  const { favorites, removeFromFavorites } = useFavoritesContext();
   const [selectedCat, setSelectedCat] = useState<FavoriteCat | null>(null);
   
   // Dynamic title based on favorites count

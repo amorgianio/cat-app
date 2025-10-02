@@ -12,20 +12,22 @@ import { RandomCatsPage } from './pages/RandomCatsPage';
 import { BreedsPage } from './pages/BreedsPage';
 import { FavoritesPage } from './pages/FavoritesPage';
 import { theme } from './components/StyledComponents';
+import { FavoritesProvider } from './contexts/FavoritesContext';
 
 const App: React.FC = () => {
   return (
     <ThemeProvider theme={theme}>
       <CssBaseline />
-      <Router>
-        <Box sx={{ 
-          minHeight: '100vh', 
-          backgroundColor: 'background.default',
-          display: 'flex',
-          flexDirection: 'column'
-        }}>
-          <Navigation />
-          <Box component="main" sx={{ flex: 1 }}>
+      <FavoritesProvider>
+        <Router>
+          <Box sx={{ 
+            minHeight: '100vh', 
+            backgroundColor: 'background.default',
+            display: 'flex',
+            flexDirection: 'column'
+          }}>
+            <Navigation />
+            <Box component="main" sx={{ flex: 1 }}>
             <Routes>
               <Route path="/" element={<RandomCatsPage />} />
               <Route path="/breeds" element={<BreedsPage />} />
@@ -37,6 +39,7 @@ const App: React.FC = () => {
           <Footer />
         </Box>
       </Router>
+    </FavoritesProvider>
     </ThemeProvider>
   );
 };

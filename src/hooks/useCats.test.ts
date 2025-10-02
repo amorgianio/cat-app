@@ -224,14 +224,19 @@ describe('useCats Hooks', () => {
     });
 
     test('should check if cat is favorite', () => {
-      (favoritesStorage.isFavorite as jest.Mock).mockReturnValue(true);
+      const mockFavoriteCat = { id: 'fav1', url: 'test.jpg', dateAdded: '2024-01-01' };
+      (favoritesStorage.getFavorites as jest.Mock).mockReturnValue([mockFavoriteCat]);
       
       const { result } = renderHook(() => useFavorites());
       
+      // Wait for the effect to run and load favorites
+      expect(result.current.favorites).toHaveLength(1);
+      
       const isFav = result.current.isFavorite('fav1');
+      const isNotFav = result.current.isFavorite('not-fav');
       
       expect(isFav).toBe(true);
-      expect(favoritesStorage.isFavorite).toHaveBeenCalledWith('fav1');
+      expect(isNotFav).toBe(false);
     });
 
     test('should handle favorite operations correctly', () => {

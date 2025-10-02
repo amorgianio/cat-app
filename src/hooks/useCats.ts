@@ -264,9 +264,9 @@ export const useFavorites = () => {
     }
   }, [loadFavorites]);
 
-  const isFavorite = (catId: string) => {
-    return favoritesStorage.isFavorite(catId);
-  };
+  const isFavorite = useCallback((catId: string) => {
+    return favorites.some(fav => fav.id === catId);
+  }, [favorites]);
 
   return { favorites, addToFavorites, removeFromFavorites, isFavorite };
 };
