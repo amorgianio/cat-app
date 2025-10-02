@@ -49,9 +49,7 @@ export const Modal: React.FC<ModalProps> = ({
           fontSize: '1.5rem',
           fontWeight: 600
         }}>
-          <Typography variant="h5" component="h2">
-            {title}
-          </Typography>
+          {title}
         </DialogTitle>
       )}
       
