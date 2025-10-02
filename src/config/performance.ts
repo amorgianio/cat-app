@@ -74,7 +74,6 @@ export class ImagePreloader {
   static preload(urls: string[], maxConcurrent: number = 3): Promise<void> {
     return new Promise(resolve => {
       const urlQueue = [...urls];
-      let completed = 0;
       let inProgress = 0;
       
       const checkComplete = () => {
@@ -98,7 +97,6 @@ export class ImagePreloader {
           
           img.onload = img.onerror = () => {
             inProgress--;
-            completed++;
             loadNext();
             checkComplete();
           };

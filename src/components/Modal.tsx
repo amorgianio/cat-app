@@ -5,8 +5,7 @@ import {
   DialogTitle,
   IconButton, 
   useMediaQuery, 
-  useTheme,
-  Typography 
+  useTheme
 } from '@mui/material';
 import { Close } from '@mui/icons-material';
 
