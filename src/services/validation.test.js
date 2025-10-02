@@ -12,7 +12,7 @@ if (typeof localStorage === 'undefined') {
   global.localStorage = localStorageMock;
 }
 
-describe(' Input Validation Security Tests', () => {
+describe('Input Validation Security Tests', () => {
   let consoleSpy;
   
   beforeEach(() => {
@@ -64,7 +64,7 @@ describe(' Input Validation Security Tests', () => {
     }
   };
 
-  describe(' XSS Attack Prevention', () => {
+  describe('XSS Attack Prevention', () => {
     test('should block script injection attacks', () => {
       const scriptAttack = '<script>alert("XSS")</script>';
       const result = validateInput.imageId(scriptAttack);
@@ -90,7 +90,7 @@ describe(' Input Validation Security Tests', () => {
     });
   });
 
-  describe(' Valid Input Handling', () => {
+  describe('Valid Input Handling', () => {
     test('should allow legitimate cat image IDs', () => {
       const validIds = ['abc123', 'cat_image_001', 'breed-photo-2023'];
       
@@ -116,7 +116,7 @@ describe(' Input Validation Security Tests', () => {
     });
   });
 
-  describe(' Edge Cases & Security', () => {
+  describe('Edge Cases & Security', () => {
     test('should handle multiple attack vectors in one input', () => {
       const multiAttack = '<script>alert(1)</script><img src=x onerror=alert(2)>';
       const result = validateInput.imageId(multiAttack);
@@ -158,7 +158,7 @@ describe(' Input Validation Security Tests', () => {
     });
   });
 
-  describe(' localStorage Security Tests', () => {
+  describe('localStorage Security Tests', () => {
     beforeEach(() => {
       localStorage.clear();
       localStorage.getItem.mockReturnValue(null);
@@ -197,7 +197,7 @@ describe(' Input Validation Security Tests', () => {
     });
   });
 
-  describe(' Performance Tests', () => {
+  describe('Performance Tests', () => {
     test('should handle large numbers efficiently', () => {
       const veryLargeNumber = 999999999;
       const result = validateInput.limit(veryLargeNumber);

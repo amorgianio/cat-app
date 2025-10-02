@@ -12,7 +12,7 @@ export const useRandomCats = () => {
   const [totalLoaded, setTotalLoaded] = useState(0);
   const [hasReachedLimit, setHasReachedLimit] = useState(false);
 
-  const loadCats = async (
+  const loadCats = useCallback(async (
     limit: number = PERFORMANCE_CONFIG.LOAD_BATCH_SIZE, 
     append: boolean = false,
     signal?: AbortSignal
@@ -53,12 +53,14 @@ export const useRandomCats = () => {
         return updatedCats;
       });
       
-      setTotalLoaded((prev: number) => prev + (newCats?.length || 0));
-      
-      // Check if we should limit loading
-      if (totalLoaded >= PERFORMANCE_CONFIG.SOFT_LIMIT_TOTAL) {
-        setHasReachedLimit(true);
-      }
+      setTotalLoaded((prev: number) => {
+        const newTotal = prev + (newCats?.length || 0);
+        // Check if we should limit loading
+        if (newTotal >= PERFORMANCE_CONFIG.SOFT_LIMIT_TOTAL) {
+          setHasReachedLimit(true);
+        }
+        return newTotal;
+      });
       
     } catch (err) {
       // Don't set error if request was aborted (expected behavior)
@@ -74,7 +76,7 @@ export const useRandomCats = () => {
         setLoading(false);
       }
     }
-  };
+  }, []);
 
   useEffect(() => {
     // Create AbortController to handle React Strict Mode double calls
@@ -86,21 +88,21 @@ export const useRandomCats = () => {
     return () => {
       abortController.abort();
     };
-  }, []);
+  }, [loadCats]);
 
   // Memoize expensive functions to prevent recreation
   const loadMore = useCallback(() => {
     if (!hasReachedLimit) {
       loadCats(PERFORMANCE_CONFIG.LOAD_BATCH_SIZE, true);
     }
-  }, [hasReachedLimit]);
+  }, [hasReachedLimit, loadCats]);
 
   const resetAndReload = useCallback(() => {
     setCats([]);
     setTotalLoaded(0);
     setHasReachedLimit(false);
     loadCats();
-  }, []);
+  }, [loadCats]);
 
   // Memoize computed values
   const canLoadMore = useMemo(() => 

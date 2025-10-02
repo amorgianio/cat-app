@@ -1,8 +1,8 @@
 // Utility functions tests
 
-describe(' Utility Functions', () => {
+describe('Utility Functions', () => {
   
-  describe(' Date & Time Utilities', () => {
+  describe('Date & Time Utilities', () => {
     test('should format date for display', () => {
       const formatDate = (dateString) => {
         const date = new Date(dateString);
@@ -41,7 +41,7 @@ describe(' Utility Functions', () => {
     });
   });
 
-  describe(' String Utilities', () => {
+  describe('String Utilities', () => {
     test('should capitalize first letter', () => {
       const capitalize = (str) => {
         if (!str) return '';
@@ -83,7 +83,7 @@ describe(' Utility Functions', () => {
     });
   });
 
-  describe(' Number Utilities', () => {
+  describe('Number Utilities', () => {
     test('should format large numbers', () => {
       const formatNumber = (num) => {
         if (num >= 1000000) return (num / 1000000).toFixed(1) + 'M';
@@ -118,7 +118,7 @@ describe(' Utility Functions', () => {
     });
   });
 
-  describe(' Array Utilities', () => {
+  describe('Array Utilities', () => {
     test('should shuffle array', () => {
       const shuffle = (array) => {
         const shuffled = [...array];
@@ -185,7 +185,7 @@ describe(' Utility Functions', () => {
     });
   });
 
-  describe(' URL Utilities', () => {
+  describe('URL Utilities', () => {
     test('should parse URL parameters', () => {
       const parseUrlParams = (url) => {
         const params = new URLSearchParams(new URL(url).search);
@@ -332,7 +332,7 @@ describe(' Utility Functions', () => {
     });
   });
 
-  describe(' Performance Utilities', () => {
+  describe('Performance Utilities', () => {
     test('should measure execution time', () => {
       const measureTime = (fn) => {
         const start = performance.now();

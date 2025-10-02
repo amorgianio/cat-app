@@ -1,7 +1,7 @@
 // Mock fetch for API tests
 global.fetch = jest.fn();
 
-describe(' Cat API Integration Tests', () => {
+describe('Cat API Integration Tests', () => {
   beforeEach(() => {
     fetch.mockClear();
     // Mock successful response
@@ -18,7 +18,7 @@ describe(' Cat API Integration Tests', () => {
     });
   });
 
-  describe(' Random Cats API', () => {
+  describe('Random Cats API', () => {
     test('should fetch random cats successfully', async () => {
       // This would test the actual API call structure
       const mockUrl = 'https://api.thecatapi.com/v1/images/search?limit=10';
@@ -56,7 +56,7 @@ describe(' Cat API Integration Tests', () => {
     });
   });
 
-  describe(' Breeds API', () => {
+  describe('Breeds API', () => {
     test('should fetch breed information', async () => {
       fetch.mockResolvedValue({
         ok: true,
@@ -79,7 +79,7 @@ describe(' Cat API Integration Tests', () => {
     });
   });
 
-  describe(' Local Storage Functions', () => {
+  describe('Local Storage Functions', () => {
     beforeEach(() => {
       localStorage.clear();
     });
@@ -139,7 +139,7 @@ describe(' Cat API Integration Tests', () => {
     });
   });
 
-  describe(' Security Validation', () => {
+  describe('Security Validation', () => {
     test('should sanitize breed IDs', () => {
       const sanitizeBreedId = (breedId) => {
         if (!breedId || typeof breedId !== 'string') {
@@ -178,7 +178,7 @@ describe(' Cat API Integration Tests', () => {
     });
   });
 
-  describe(' Performance Helpers', () => {
+  describe('Performance Helpers', () => {
     test('should measure function execution time', () => {
       const measurePerformance = (fn) => {
         const start = performance.now();
@@ -212,7 +212,7 @@ describe(' Cat API Integration Tests', () => {
     });
   });
 
-  describe(' URL Route Validation', () => {
+  describe('URL Route Validation', () => {
     test('should validate cat ID from URL params', () => {
       const validateCatId = (catId) => {
         if (!catId || typeof catId !== 'string') return false;

@@ -29,13 +29,13 @@ const renderApp = () => {
   return render(<App />);
 };
 
-describe(' App Component', () => {
+describe('App Component', () => {
   beforeEach(() => {
     // Reset any mocks before each test
     jest.clearAllMocks();
   });
 
-  describe(' Layout & Structure', () => {
+  describe('Layout & Structure', () => {
     test('should render main layout components', () => {
       renderApp();
       
@@ -52,7 +52,7 @@ describe(' App Component', () => {
     });
   });
 
-  describe(' Routing', () => {
+  describe('Routing', () => {
     test('should render RandomCatsPage on default route', () => {
       // App already includes Router
       render(<App />);
@@ -70,7 +70,7 @@ describe(' App Component', () => {
     });
   });
 
-  describe(' Theme Integration', () => {
+  describe('Theme Integration', () => {
     test('should apply ThemeProvider and CssBaseline', () => {
       const { container } = renderApp();
       
@@ -80,7 +80,7 @@ describe(' App Component', () => {
     });
   });
 
-  describe(' Responsive Design', () => {
+  describe('Responsive Design', () => {
     test('should have responsive layout structure', () => {
       renderApp();
       
@@ -97,7 +97,7 @@ describe(' App Component', () => {
     });
   });
 
-  describe(' Component Integration', () => {
+  describe('Component Integration', () => {
     test('should render all essential components together', () => {
       renderApp();
       
@@ -108,7 +108,7 @@ describe(' App Component', () => {
     });
 
     test('should maintain proper component hierarchy', () => {
-      const { container } = renderApp();
+      renderApp();
       
       // Check that components are in the expected hierarchy
       const nav = screen.getByTestId('navigation');

@@ -12,9 +12,7 @@ import {
   Skeleton
 } from '@mui/material';
 import { Modal } from '../components/Modal';
-import { CatCard } from '../components/CatCard';
 import { CatDetailModal } from '../components/CatDetailModal';
-import { CatCardSkeleton } from '../components/CatCardSkeleton';
 import { BreedGridSkeleton } from '../components/BreedCardSkeleton';
 import { useDocumentTitle, createTitle, PAGE_TITLES } from '../hooks/useDocumentTitle';
 import { DIMENSIONS } from '../components/StyledComponents';

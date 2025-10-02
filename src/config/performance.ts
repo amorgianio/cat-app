@@ -77,6 +77,12 @@ export class ImagePreloader {
       let completed = 0;
       let inProgress = 0;
       
+      const checkComplete = () => {
+        if (urlQueue.length === 0 && inProgress === 0) {
+          resolve();
+        }
+      };
+      
       const loadNext = () => {
         if (urlQueue.length === 0 && inProgress === 0) {
           resolve();
@@ -94,6 +100,7 @@ export class ImagePreloader {
             inProgress--;
             completed++;
             loadNext();
+            checkComplete();
           };
           
           img.src = url;

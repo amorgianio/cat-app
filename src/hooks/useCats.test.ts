@@ -33,7 +33,7 @@ jest.mock('../config/performance', () => ({
   }
 }));
 
-describe(' useCats Hooks', () => {
+describe('useCats Hooks', () => {
   const mockCats: CatImage[] = [
     {
       id: 'cat1',
@@ -55,7 +55,7 @@ describe(' useCats Hooks', () => {
     global.fetch = jest.fn();
   });
 
-  describe(' useRandomCats Hook', () => {
+  describe('useRandomCats Hook', () => {
     beforeEach(() => {
       (catApi.getRandomCats as jest.Mock).mockResolvedValue(mockCats);
     });
@@ -175,7 +175,7 @@ describe(' useCats Hooks', () => {
     });
   });
 
-  describe(' useFavorites Hook', () => {
+  describe('useFavorites Hook', () => {
     const mockFavoriteCat = {
       id: 'fav1',
       url: 'https://example.com/fav1.jpg',
@@ -275,7 +275,7 @@ describe(' useCats Hooks', () => {
     });
   });
 
-  describe(' Hook Integration', () => {
+  describe('Hook Integration', () => {
     beforeEach(() => {
       (catApi.getRandomCats as jest.Mock).mockResolvedValue(mockCats);
       (favoritesStorage.getFavorites as jest.Mock).mockReturnValue([]);
@@ -299,7 +299,7 @@ describe(' useCats Hooks', () => {
     });
   });
 
-  describe(' useBreeds Hook', () => {
+  describe('useBreeds Hook', () => {
     const mockBreeds: Breed[] = [
       {
         id: 'siam',
@@ -381,7 +381,7 @@ describe(' useCats Hooks', () => {
     });
   });
 
-  describe(' useBreedImages Hook', () => {
+  describe('useBreedImages Hook', () => {
     const mockBreedImages: CatImage[] = [
       {
         id: 'breed-cat-1',

@@ -1,8 +1,8 @@
 // Component logic tests in pure JavaScript for better compatibility
 
-describe(' Component Logic Tests', () => {
+describe('Component Logic Tests', () => {
   
-  describe(' CatCard Logic', () => {
+  describe('CatCard Logic', () => {
     test('should determine if cat is favorited', () => {
       const mockFavorites = [
         { id: 'cat1', url: 'test1.jpg' },
@@ -72,13 +72,8 @@ describe(' Component Logic Tests', () => {
     });
   });
 
-  describe(' Navigation Logic', () => {
+  describe('Navigation Logic', () => {
     test('should determine active navigation item', () => {
-      const navItems = [
-        { path: '/', label: 'Random Cats' },
-        { path: '/breeds', label: 'Breeds' },
-        { path: '/favorites', label: 'Favorites' }
-      ];
 
       const isActiveRoute = (currentPath, itemPath) => {
         if (itemPath === '/') {
@@ -115,7 +110,7 @@ describe(' Component Logic Tests', () => {
     });
   });
 
-  describe(' Pagination Logic', () => {
+  describe('Pagination Logic', () => {
     test('should calculate pagination info', () => {
       const calculatePagination = (currentPage, totalItems, itemsPerPage) => {
         const totalPages = Math.ceil(totalItems / itemsPerPage);
@@ -172,7 +167,7 @@ describe(' Component Logic Tests', () => {
     });
   });
 
-  describe(' Search & Filter Logic', () => {
+  describe('Search & Filter Logic', () => {
     test('should filter cats by breed', () => {
       const cats = [
         { id: '1', breeds: [{ id: 'siamese', name: 'Siamese' }] },
@@ -220,7 +215,7 @@ describe(' Component Logic Tests', () => {
     });
   });
 
-  describe(' State Management Logic', () => {
+  describe('State Management Logic', () => {
     test('should manage loading states', () => {
       let state = {
         loading: false,
@@ -301,7 +296,7 @@ describe(' Component Logic Tests', () => {
     });
   });
 
-  describe(' Theme & Styling Logic', () => {
+  describe('Theme & Styling Logic', () => {
     test('should calculate responsive breakpoints', () => {
       const getBreakpoint = (width) => {
         if (width < 600) return 'xs';
@@ -339,7 +334,7 @@ describe(' Component Logic Tests', () => {
     });
   });
 
-  describe(' Loading & Error States', () => {
+  describe('Loading & Error States', () => {
     test('should manage loading state transitions', () => {
       const createLoadingManager = () => {
         let isLoading = false;
