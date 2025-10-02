@@ -119,8 +119,8 @@ export const RandomCatsPage: React.FC = memo(() => {
         <>
           <Grid container spacing={3}>
             {/* Actual cat cards */}
-            {cats.map((cat: CatImage) => (
-              <Grid item xs={12} sm={6} md={4} lg={3} key={cat.id}>
+            {cats.map((cat: CatImage, index: number) => (
+              <Grid item xs={12} sm={6} md={4} lg={3} key={`${cat.id}-${index}`}>
                 <CatCard 
                   cat={cat} 
                   onClick={handleCatClick}
