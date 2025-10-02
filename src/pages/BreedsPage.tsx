@@ -8,7 +8,6 @@ import {
   CardContent,
   CardMedia,
   Box,
-  CircularProgress,
   Alert,
   Skeleton
 } from '@mui/material';

@@ -5,7 +5,6 @@ import {
   Typography,
   Button,
   Chip,
-  CircularProgress,
   Alert,
   CardMedia,
   Divider,
