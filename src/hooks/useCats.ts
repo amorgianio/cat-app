@@ -120,35 +120,59 @@ export const useRandomCats = () => {
   };
 };
 
-// Hook for managing cat breeds
+// Hook for managing cat breeds with AbortController support
 export const useBreeds = () => {
   const [breeds, setBreeds] = useState<Breed[]>([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
-    const loadBreeds = async () => {
+    // Create AbortController to handle React Strict Mode double calls
+    const abortController = new AbortController();
+    
+    const loadBreeds = async (signal: AbortSignal) => {
       setLoading(true);
       setError(null);
       
       try {
-        const breedsData = await catApi.getBreeds();
+        // Pass AbortSignal to API call
+        const breedsData = await catApi.getBreeds(signal);
+        
+        // Check if request was aborted before updating state
+        if (signal?.aborted) {
+          console.log('Breeds request was aborted, skipping state update');
+          return;
+        }
+        
         setBreeds(breedsData);
       } catch (err) {
+        // Don't set error if request was aborted (expected behavior)
+        if (signal?.aborted || (err as Error)?.name === 'AbortError') {
+          console.log('Breeds request aborted by cleanup');
+          return;
+        }
         setError('Failed to load breeds. Please try again.');
         console.error('Error loading breeds:', err);
       } finally {
-        setLoading(false);
+        // Only set loading to false if request wasn't aborted
+        if (!signal?.aborted) {
+          setLoading(false);
+        }
       }
     };
 
-    loadBreeds();
+    loadBreeds(abortController.signal);
+    
+    // Cleanup function to abort request if component unmounts or effect re-runs
+    return () => {
+      abortController.abort();
+    };
   }, []);
 
   return { breeds, loading, error };
 };
 
-// Hook for managing breed images
+// Hook for managing breed images with AbortController support
 export const useBreedImages = (breedId: string | null) => {
   const [images, setImages] = useState<CatImage[]>([]);
   const [loading, setLoading] = useState(false);
@@ -160,22 +184,46 @@ export const useBreedImages = (breedId: string | null) => {
       return;
     }
 
-    const loadBreedImages = async () => {
+    // Create AbortController to handle React Strict Mode double calls
+    const abortController = new AbortController();
+
+    const loadBreedImages = async (signal: AbortSignal) => {
       setLoading(true);
       setError(null);
       
       try {
-        const imageData = await catApi.getImagesByBreed(breedId);
+        // Pass AbortSignal to API call
+        const imageData = await catApi.getImagesByBreed(breedId, 8, signal);
+        
+        // Check if request was aborted before updating state
+        if (signal?.aborted) {
+          console.log('Breed images request was aborted, skipping state update');
+          return;
+        }
+        
         setImages(imageData);
       } catch (err) {
+        // Don't set error if request was aborted (expected behavior)
+        if (signal?.aborted || (err as Error)?.name === 'AbortError') {
+          console.log('Breed images request aborted by cleanup');
+          return;
+        }
         setError('Failed to load breed images. Please try again.');
         console.error('Error loading breed images:', err);
       } finally {
-        setLoading(false);
+        // Only set loading to false if request wasn't aborted
+        if (!signal?.aborted) {
+          setLoading(false);
+        }
       }
     };
 
-    loadBreedImages();
+    loadBreedImages(abortController.signal);
+    
+    // Cleanup function to abort request if component unmounts or effect re-runs
+    return () => {
+      abortController.abort();
+    };
   }, [breedId]);
 
   return { images, loading, error };

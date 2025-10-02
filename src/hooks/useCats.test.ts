@@ -1,13 +1,15 @@
 import { renderHook, act, waitFor } from '@testing-library/react';
-import { useRandomCats, useFavorites } from './useCats';
+import { useRandomCats, useFavorites, useBreeds, useBreedImages } from './useCats';
 import { catApi, favoritesStorage } from '../services/catApi';
-import { CatImage } from '../types';
+import { CatImage, Breed } from '../types';
 
 // Mock the API and storage
 jest.mock('../services/catApi', () => ({
   catApi: {
     getRandomCats: jest.fn(),
-    getCatsByBreed: jest.fn()
+    getCatsByBreed: jest.fn(),
+    getBreeds: jest.fn(),
+    getImagesByBreed: jest.fn()
   },
   favoritesStorage: {
     getFavorites: jest.fn(),
@@ -294,6 +296,217 @@ describe(' useCats Hooks', () => {
       });
       
       expect(favoritesStorage.addToFavorites).toHaveBeenCalledWith(mockCats[0]);
+    });
+  });
+
+  describe(' useBreeds Hook', () => {
+    const mockBreeds: Breed[] = [
+      {
+        id: 'siam',
+        name: 'Siamese',
+        origin: 'Thailand',
+        temperament: 'Active, Agile',
+        description: 'The Siamese cat is one of the first distinctly recognized breeds of Asian cat.',
+        life_span: '12 - 15',
+        weight: {
+          imperial: '8 - 12',
+          metric: '4 - 5'
+        }
+      },
+      {
+        id: 'pers',
+        name: 'Persian',
+        origin: 'Iran',
+        temperament: 'Quiet, Sweet',
+        description: 'The Persian cat is a long-haired breed of cat characterized by its round face.',
+        life_span: '12 - 17',
+        weight: {
+          imperial: '7 - 12',
+          metric: '3 - 5'
+        }
+      }
+    ];
+
+    beforeEach(() => {
+      jest.clearAllMocks();
+      (catApi.getBreeds as jest.Mock).mockResolvedValue(mockBreeds);
+    });
+
+    test('should initialize with empty state', () => {
+      const { result } = renderHook(() => useBreeds());
+      
+      expect(result.current.breeds).toEqual([]);
+      expect(result.current.loading).toBe(true);
+      expect(result.current.error).toBe(null);
+    });
+
+    test('should load breeds on mount', async () => {
+      const { result } = renderHook(() => useBreeds());
+      
+      await waitFor(() => {
+        expect(result.current.breeds).toEqual(mockBreeds);
+        expect(result.current.loading).toBe(false);
+        expect(result.current.error).toBe(null);
+      });
+      
+      expect(catApi.getBreeds).toHaveBeenCalledTimes(1);
+      expect(catApi.getBreeds).toHaveBeenCalledWith(expect.any(AbortSignal));
+    });
+
+    test('should handle API errors', async () => {
+      const errorMessage = 'Network error';
+      (catApi.getBreeds as jest.Mock).mockRejectedValue(new Error(errorMessage));
+      
+      const { result } = renderHook(() => useBreeds());
+      
+      await waitFor(() => {
+        expect(result.current.error).toBe('Failed to load breeds. Please try again.');
+        expect(result.current.loading).toBe(false);
+        expect(result.current.breeds).toEqual([]);
+      });
+    });
+
+    test('should handle aborted requests', async () => {
+      const abortError = new Error('Request aborted');
+      abortError.name = 'AbortError';
+      (catApi.getBreeds as jest.Mock).mockRejectedValue(abortError);
+      
+      const { result } = renderHook(() => useBreeds());
+      
+      await waitFor(() => {
+        // Should not set error for aborted requests
+        expect(result.current.error).toBe(null);
+        expect(result.current.breeds).toEqual([]);
+      });
+    });
+  });
+
+  describe(' useBreedImages Hook', () => {
+    const mockBreedImages: CatImage[] = [
+      {
+        id: 'breed-cat-1',
+        url: 'https://example.com/siamese1.jpg',
+        width: 400,
+        height: 300,
+        breeds: [{
+          id: 'siam',
+          name: 'Siamese',
+          origin: 'Thailand',
+          temperament: 'Active, Agile',
+          description: 'The Siamese cat breed.',
+          life_span: '12 - 15',
+          weight: { imperial: '8 - 12', metric: '4 - 5' }
+        }]
+      },
+      {
+        id: 'breed-cat-2',
+        url: 'https://example.com/siamese2.jpg',
+        width: 400,
+        height: 300,
+        breeds: [{
+          id: 'siam',
+          name: 'Siamese',
+          origin: 'Thailand',
+          temperament: 'Active, Agile',
+          description: 'The Siamese cat breed.',
+          life_span: '12 - 15',
+          weight: { imperial: '8 - 12', metric: '4 - 5' }
+        }]
+      }
+    ];
+
+    beforeEach(() => {
+      jest.clearAllMocks();
+      (catApi.getImagesByBreed as jest.Mock).mockResolvedValue(mockBreedImages);
+    });
+
+    test('should initialize with empty state when no breedId', () => {
+      const { result } = renderHook(() => useBreedImages(null));
+      
+      expect(result.current.images).toEqual([]);
+      expect(result.current.loading).toBe(false);
+      expect(result.current.error).toBe(null);
+    });
+
+    test('should load breed images when breedId provided', async () => {
+      const { result } = renderHook(() => useBreedImages('siam'));
+      
+      await waitFor(() => {
+        expect(result.current.images).toEqual(mockBreedImages);
+        expect(result.current.loading).toBe(false);
+        expect(result.current.error).toBe(null);
+      });
+      
+      expect(catApi.getImagesByBreed).toHaveBeenCalledTimes(1);
+      expect(catApi.getImagesByBreed).toHaveBeenCalledWith('siam', 8, expect.any(AbortSignal));
+    });
+
+    test('should clear images when breedId changes to null', async () => {
+      const { result, rerender } = renderHook(
+        ({ breedId }: { breedId: string | null }) => useBreedImages(breedId),
+        { initialProps: { breedId: 'siam' as string | null } }
+      );
+      
+      // Wait for initial load
+      await waitFor(() => {
+        expect(result.current.loading).toBe(false);
+      });
+      
+      // Change to null breedId
+      rerender({ breedId: null });
+      
+      expect(result.current.images).toEqual([]);
+      expect(result.current.loading).toBe(false);
+    });
+
+    test('should handle API errors', async () => {
+      const errorMessage = 'Network error';
+      (catApi.getImagesByBreed as jest.Mock).mockRejectedValue(new Error(errorMessage));
+      
+      const { result } = renderHook(() => useBreedImages('siam'));
+      
+      await waitFor(() => {
+        expect(result.current.error).toBe('Failed to load breed images. Please try again.');
+        expect(result.current.loading).toBe(false);
+        expect(result.current.images).toEqual([]);
+      });
+    });
+
+    test('should handle aborted requests', async () => {
+      const abortError = new Error('Request aborted');
+      abortError.name = 'AbortError';
+      (catApi.getImagesByBreed as jest.Mock).mockRejectedValue(abortError);
+      
+      const { result } = renderHook(() => useBreedImages('siam'));
+      
+      await waitFor(() => {
+        // Should not set error for aborted requests
+        expect(result.current.error).toBe(null);
+        expect(result.current.images).toEqual([]);
+      });
+    });
+
+    test('should reload when breedId changes', async () => {
+      const { result, rerender } = renderHook(
+        ({ breedId }: { breedId: string | null }) => useBreedImages(breedId),
+        { initialProps: { breedId: 'siam' as string | null } }
+      );
+      
+      await waitFor(() => {
+        expect(result.current.images).toEqual(mockBreedImages);
+      });
+      
+      // Change breed ID
+      const persianImages = [{ ...mockBreedImages[0], id: 'persian-cat-1' }];
+      (catApi.getImagesByBreed as jest.Mock).mockResolvedValue(persianImages);
+      
+      rerender({ breedId: 'pers' });
+      
+      await waitFor(() => {
+        expect(result.current.images).toEqual(persianImages);
+      });
+      
+      expect(catApi.getImagesByBreed).toHaveBeenCalledWith('pers', 8, expect.any(AbortSignal));
     });
   });
 });

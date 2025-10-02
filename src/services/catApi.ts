@@ -112,17 +112,21 @@ export const catApi = {
     return response.data;
   },
 
-  // Get all cat breeds
-  getBreeds: async (): Promise<Breed[]> => {
-    const response = await api.get('/breeds');
+  // Get all cat breeds with AbortSignal support
+  getBreeds: async (signal?: AbortSignal): Promise<Breed[]> => {
+    const response = await api.get('/breeds', {
+      signal
+    });
     return response.data;
   },
 
-  // Get images for a specific breed with input validation
-  getImagesByBreed: async (breedId: string, limit: number = 8): Promise<CatImage[]> => {
+  // Get images for a specific breed with input validation and AbortSignal support
+  getImagesByBreed: async (breedId: string, limit: number = 8, signal?: AbortSignal): Promise<CatImage[]> => {
     const safeBreedId = validateInput.breedId(breedId);
     const safeLimit = validateInput.limit(limit);
-    const response = await api.get(`/images/search?breed_ids=${safeBreedId}&limit=${safeLimit}`);
+    const response = await api.get(`/images/search?breed_ids=${safeBreedId}&limit=${safeLimit}`, {
+      signal
+    });
     return response.data;
   },
 };
